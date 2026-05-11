@@ -137,6 +137,9 @@ for file in "${FILES[@]}"; do
   replace_literal "$target" "starter_back" "$BACK_REPO"
   replace_literal "$target" "starter_front" "$FRONT_REPO"
   replace_literal "$target" "starter_infra" "$INFRA_REPO"
+  replace_literal "$target" "App Front" "$PROJECT_TITLE"
+  replace_literal "$target" "App front" "${PROJECT_TITLE} front"
+  replace_literal "$target" "App frontend" "${PROJECT_TITLE} frontend"
   replace_literal "$target" "Starter Front" "$PROJECT_TITLE"
   replace_literal "$target" "Starter front" "${PROJECT_TITLE} front"
   replace_literal "$target" "Starter frontend" "${PROJECT_TITLE} frontend"
@@ -149,6 +152,7 @@ for file in "${FILES[@]}"; do
 done
 
 replace_literal "${ROOT_DIR}/public/manifest.webmanifest" '"short_name": "Starter"' "\"short_name\": \"${PROJECT_TITLE}\""
+replace_literal "${ROOT_DIR}/public/manifest.webmanifest" '"short_name": "App"' "\"short_name\": \"${PROJECT_TITLE}\""
 
 cat <<EOF
 Project templating applied in starter_front.

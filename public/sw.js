@@ -3,7 +3,7 @@ self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim(
 
 self.addEventListener("push", (event) => {
   const payload = readPushPayload(event.data);
-  const title = payload.title || "Starter Front";
+  const title = payload.title || "App Front";
   const body = payload.body || "New notification";
 
   event.waitUntil(

@@ -16,7 +16,7 @@ export default function HomePage() {
   return (
     <>
       <Section
-        eyebrow="Starter Front"
+        eyebrow="App Front"
         title="Base Next.js générique prête pour des produits SaaS orientés User."
         description="Ce starter reprend les briques transversales utiles d’Akoky sans domaine dating, sans Profile, et avec une structure claire pour démarrer vite."
         actions={

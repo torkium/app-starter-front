@@ -1,13 +1,13 @@
 {
-  "name": "Starter Front",
-  "short_name": "Starter",
+  "name": "App Front",
+  "short_name": "App",
   "id": "/",
   "start_url": "/",
   "display": "standalone",
   "display_override": ["standalone", "browser"],
   "background_color": "#f4f1ea",
   "theme_color": "#0f766e",
-  "description": "Starter frontend Next.js avec auth SSR, proxy API, PWA et shells media/billing.",
+  "description": "Frontend Next.js generique avec auth SSR, proxy API, PWA et shells media/billing.",
   "icons": [
     {
       "src": "/icons/icon-192.svg",

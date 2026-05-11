@@ -21,7 +21,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <>
       <header style={headerStyle}>
         <Link href="/" style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", fontWeight: 700 }}>
-          Starter Front
+          App Front
         </Link>
         <nav style={{ display: "flex", gap: ".75rem", alignItems: "center", flexWrap: "wrap" }}>
           <ButtonLink href="/dashboard" tone="ghost">
@@ -77,7 +77,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {hydrated && consent === null ? (
         <div style={cookieBannerStyle}>
-          <span>Ce starter inclut une bannière cookies simple pour analytics et tags futurs.</span>
+          <span>Cette base inclut une bannière cookies simple pour analytics et tags futurs.</span>
           <div style={{ display: "flex", gap: ".75rem", flexWrap: "wrap" }}>
             <Button onClick={() => setConsent("accepted")}>Accepter</Button>
             <Button tone="secondary" onClick={() => setConsent("declined")}>
@@ -88,7 +88,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       ) : null}
 
       <footer style={footerStyle}>
-        <span>Starter frontend générique, neutralisé, dockerisé.</span>
+        <span>Frontend générique, neutralisé et dockerisé.</span>
       </footer>
     </>
   );

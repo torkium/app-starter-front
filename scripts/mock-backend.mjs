@@ -49,7 +49,7 @@ const server = http.createServer((request, response) => {
     json(response, 200, {
       id: "user-123",
       email: "hello@example.test",
-      firstName: "Starter",
+      firstName: "Demo",
       lastName: "User",
       roles: ["ROLE_USER"],
       emailVerified: true,

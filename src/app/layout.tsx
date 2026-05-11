@@ -18,9 +18,9 @@ const bodyFont = Instrument_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Starter Front",
-  description: "Starter frontend Next.js SSR, auth, API proxy, realtime et design system neutre.",
-  applicationName: "Starter Front",
+  title: "App Front",
+  description: "Frontend Next.js SSR, auth, proxy API, realtime et design system neutre.",
+  applicationName: "App Front",
   manifest: "/manifest.webmanifest",
 };
 

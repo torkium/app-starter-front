@@ -31,7 +31,7 @@ export const env = {
   API_MEDIA_LIBRARY_PATH: process.env.API_MEDIA_LIBRARY_PATH ?? "/media/assets",
   API_PUSH_SUBSCRIPTIONS_PATH: process.env.API_PUSH_SUBSCRIPTIONS_PATH ?? "/notifications/push/subscriptions",
   get NEXT_PUBLIC_APP_NAME() {
-    return readPublicValue("NEXT_PUBLIC_APP_NAME", process.env.NEXT_PUBLIC_APP_NAME ?? "Starter Front");
+    return readPublicValue("NEXT_PUBLIC_APP_NAME", process.env.NEXT_PUBLIC_APP_NAME ?? "App Front");
   },
   get NEXT_PUBLIC_APP_URL() {
     return readPublicValue("NEXT_PUBLIC_APP_URL", "http://localhost:3000");
