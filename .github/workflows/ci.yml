@@ -1,0 +1,106 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+
+concurrency:
+  group: starter-front-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint, typecheck, tests and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Tests
+        run: npm run test
+
+      - name: Validate public runtime contract
+        env:
+          NEXT_PUBLIC_APP_NAME: Starter Front
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          NEXT_PUBLIC_MERCURE_DISABLED: "true"
+          NEXT_PUBLIC_MERCURE_URL: http://localhost/.well-known/mercure
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_stub
+          NEXT_PUBLIC_MEDIA_BASE_URL: http://localhost:3000
+          NEXT_PUBLIC_MEDIA_UPLOAD_BASE_URL: http://localhost:3000
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY: BElocalTestValue1234567890
+        run: npm run validate:public-runtime
+
+      - name: Build
+        run: npm run build
+
+  docker-runtime:
+    name: Docker runtime smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: quality
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t starter-front-ci:${{ github.sha }} .
+
+      - name: Smoke test runtime image
+        run: |
+          set -euo pipefail
+
+          node scripts/mock-backend.mjs >/tmp/starter-front-mock.log 2>&1 &
+          mock_pid=$!
+
+          cid="$(docker run -d -p 13000:3000 \
+            --add-host=host.docker.internal:host-gateway \
+            -e API_BASE_URL=http://host.docker.internal:4100/api \
+            -e NEXT_PUBLIC_APP_NAME='Starter Front' \
+            -e NEXT_PUBLIC_APP_URL=http://localhost:13000 \
+            -e NEXT_PUBLIC_MERCURE_DISABLED=false \
+            -e NEXT_PUBLIC_MERCURE_URL=http://localhost:17000/.well-known/mercure \
+            -e NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_stub \
+            -e NEXT_PUBLIC_MEDIA_BASE_URL=http://localhost:18080/media \
+            -e NEXT_PUBLIC_MEDIA_UPLOAD_BASE_URL=http://localhost:13000 \
+            -e NEXT_PUBLIC_VAPID_PUBLIC_KEY=BElocalTestValue1234567890 \
+            starter-front-ci:${{ github.sha }})"
+
+          cleanup() {
+            kill "$mock_pid" >/dev/null 2>&1 || true
+            docker rm -f "$cid" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          for _ in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:13000/ >/dev/null; then
+              break
+            fi
+            sleep 2
+          done
+
+          curl -fsS http://127.0.0.1:13000/runtime-config.js | grep -q 'NEXT_PUBLIC_APP_URL'
+          curl -fsSI http://127.0.0.1:13000/ | grep -i 'content-security-policy:.*http://localhost:17000'
+          curl -fsSI http://127.0.0.1:13000/ | grep -i 'content-security-policy:.*http://localhost:18080'
+          curl -fsS http://127.0.0.1:13000/api/proxy/account/me \
+            -H 'Cookie: starter_refresh_token=valid-refresh' \
+            | grep -q '"email":"hello@example.test"'

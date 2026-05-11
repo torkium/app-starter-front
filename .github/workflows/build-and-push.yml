@@ -1,0 +1,286 @@
+name: Build And Push
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Deployment environment tag to use
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+        default: staging
+      dispatch_infra:
+        description: Trigger infra deployment dispatch if configured
+        required: true
+        type: boolean
+        default: false
+
+concurrency:
+  group: starter-front-build-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  metadata:
+    runs-on: ubuntu-latest
+    outputs:
+      branch_slug: ${{ steps.compute.outputs.branch_slug }}
+      deploy_env: ${{ steps.compute.outputs.deploy_env }}
+      image_name: ${{ steps.compute.outputs.image_name }}
+      short_sha: ${{ steps.compute.outputs.short_sha }}
+      version_tag: ${{ steps.compute.outputs.version_tag }}
+      should_dispatch: ${{ steps.compute.outputs.should_dispatch }}
+
+    steps:
+      - name: Compute image metadata
+        id: compute
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_ENVIRONMENT: ${{ inputs.environment }}
+          INPUT_DISPATCH_INFRA: ${{ inputs.dispatch_infra }}
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+          REPOSITORY_NAME: ${{ github.event.repository.name }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          branch_slug="$(printf '%s' "${REF_NAME}" | tr '[:upper:]' '[:lower:]' | sed -E 's#[^a-z0-9._-]+#-#g; s#^-+##; s#-+$##')"
+          short_sha="${SHA::7}"
+
+          if [ "${EVENT_NAME}" = "workflow_dispatch" ]; then
+            deploy_env="${INPUT_ENVIRONMENT}"
+          else
+            case "${REF_NAME}" in
+              develop) deploy_env="dev" ;;
+              main) deploy_env="staging" ;;
+              *) deploy_env="${branch_slug}" ;;
+            esac
+          fi
+
+          should_dispatch="false"
+          if [ "${EVENT_NAME}" = "push" ] && { [ "${REF_NAME}" = "develop" ] || [ "${REF_NAME}" = "main" ]; }; then
+            should_dispatch="true"
+          fi
+          if [ "${EVENT_NAME}" = "workflow_dispatch" ] && [ "${INPUT_DISPATCH_INFRA}" = "true" ]; then
+            should_dispatch="true"
+          fi
+
+          image_name="ghcr.io/${REPOSITORY_OWNER}/${REPOSITORY_NAME}"
+          version_tag="${deploy_env}-${short_sha}"
+
+          {
+            echo "branch_slug=${branch_slug}"
+            echo "deploy_env=${deploy_env}"
+            echo "image_name=${image_name}"
+            echo "short_sha=${short_sha}"
+            echo "version_tag=${version_tag}"
+            echo "should_dispatch=${should_dispatch}"
+          } >> "$GITHUB_OUTPUT"
+
+  quality:
+    name: Lint, tests, typecheck and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Tests
+        run: npm run test
+
+      - name: Build
+        run: npm run build
+
+      - name: Validate public runtime contract
+        env:
+          NEXT_PUBLIC_APP_NAME: Starter Front
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          NEXT_PUBLIC_MERCURE_DISABLED: "true"
+          NEXT_PUBLIC_MERCURE_URL: http://localhost/.well-known/mercure
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_stub
+          NEXT_PUBLIC_MEDIA_BASE_URL: http://localhost:3000/media
+          NEXT_PUBLIC_MEDIA_UPLOAD_BASE_URL: http://localhost:3000
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY: BElocalTestValue1234567890
+        run: node scripts/validate-public-runtime-env.mjs
+
+  smoke-image:
+    name: Docker runtime smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: quality
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t starter-front-smoke:${{ github.sha }} .
+
+      - name: Smoke test runtime image
+        run: |
+          set -euo pipefail
+
+          node scripts/mock-backend.mjs >/tmp/starter-front-mock.log 2>&1 &
+          mock_pid=$!
+
+          cid="$(docker run -d -p 13000:3000 \
+            --add-host=host.docker.internal:host-gateway \
+            -e API_BASE_URL=http://host.docker.internal:4100/api \
+            -e NEXT_PUBLIC_APP_NAME='Starter Front' \
+            -e NEXT_PUBLIC_APP_URL=http://localhost:13000 \
+            -e NEXT_PUBLIC_MERCURE_DISABLED=false \
+            -e NEXT_PUBLIC_MERCURE_URL=http://localhost:17000/.well-known/mercure \
+            -e NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_stub \
+            -e NEXT_PUBLIC_MEDIA_BASE_URL=http://localhost:18080/media \
+            -e NEXT_PUBLIC_MEDIA_UPLOAD_BASE_URL=http://localhost:13000 \
+            -e NEXT_PUBLIC_VAPID_PUBLIC_KEY=BElocalTestValue1234567890 \
+            starter-front-smoke:${{ github.sha }})"
+
+          cleanup() {
+            kill "$mock_pid" >/dev/null 2>&1 || true
+            docker rm -f "$cid" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          for _ in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:13000/ >/dev/null; then
+              break
+            fi
+            sleep 2
+          done
+
+          curl -fsS http://127.0.0.1:13000/runtime-config.js | grep -q 'NEXT_PUBLIC_APP_URL'
+          curl -fsSI http://127.0.0.1:13000/ | grep -i 'content-security-policy:.*http://localhost:17000'
+          curl -fsSI http://127.0.0.1:13000/ | grep -i 'content-security-policy:.*http://localhost:18080'
+          curl -fsS http://127.0.0.1:13000/api/proxy/account/me \
+            -H 'Cookie: starter_refresh_token=valid-refresh' \
+            | grep -q '"email":"hello@example.test"'
+
+  build-and-push:
+    name: Build and publish image
+    runs-on: ubuntu-latest
+    needs:
+      - metadata
+      - quality
+      - smoke-image
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Tests
+        run: npm run test
+
+      - name: Validate public runtime contract
+        env:
+          NEXT_PUBLIC_APP_NAME: Starter Front
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          NEXT_PUBLIC_MERCURE_DISABLED: "true"
+          NEXT_PUBLIC_MERCURE_URL: http://localhost/.well-known/mercure
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_stub
+          NEXT_PUBLIC_MEDIA_BASE_URL: http://localhost:3000/media
+          NEXT_PUBLIC_MEDIA_UPLOAD_BASE_URL: http://localhost:3000
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY: BElocalTestValue1234567890
+        run: node scripts/validate-public-runtime-env.mjs
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ needs.metadata.outputs.image_name }}
+          tags: |
+            type=raw,value=${{ needs.metadata.outputs.deploy_env }}
+            type=raw,value=${{ needs.metadata.outputs.version_tag }}
+            type=raw,value=sha-${{ needs.metadata.outputs.short_sha }}
+            type=raw,value=${{ needs.metadata.outputs.branch_slug }}-${{ needs.metadata.outputs.short_sha }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  dispatch-infra:
+    runs-on: ubuntu-latest
+    needs:
+      - metadata
+      - build-and-push
+    if: needs.metadata.outputs.should_dispatch == 'true' && vars.INFRA_REPOSITORY != ''
+
+    steps:
+      - name: Check dispatch token
+        env:
+          DISPATCH_TOKEN: ${{ secrets.INFRA_REPOSITORY_DISPATCH_TOKEN }}
+        run: |
+          test -n "${DISPATCH_TOKEN}"
+
+      - name: Dispatch deployment to infra repository
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.INFRA_REPOSITORY_DISPATCH_TOKEN }}
+          repository: ${{ vars.INFRA_REPOSITORY }}
+          event-type: deploy
+          client-payload: >-
+            {
+              "environment": "${{ needs.metadata.outputs.deploy_env }}",
+              "app": "front",
+              "image": "${{ needs.metadata.outputs.image_name }}",
+              "version": "${{ needs.metadata.outputs.version_tag }}",
+              "repository": "${{ github.repository }}",
+              "source_repository": "${{ github.repository }}",
+              "source_sha": "${{ github.sha }}"
+            }

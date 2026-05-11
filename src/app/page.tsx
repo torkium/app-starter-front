@@ -1,66 +1,67 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import Link from "next/link";
+import { ButtonLink } from "@/design-system/components/Button";
+import { Card } from "@/design-system/components/Card";
+import { Section } from "@/design-system/layouts/Section";
 
-export default function Home() {
+const starterFeatures = [
+  "auth SSR par cookies httpOnly",
+  "proxy API prêt pour backend externe",
+  "shell realtime Mercure et SSE",
+  "billing Stripe et upload média neutralisés",
+  "bannière cookies et proposition PWA",
+  "architecture 4 couches lisible",
+];
+
+export default function HomePage() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <Section
+        eyebrow="Starter Front"
+        title="Base Next.js générique prête pour des produits SaaS orientés User."
+        description="Ce starter reprend les briques transversales utiles d’Akoky sans domaine dating, sans Profile, et avec une structure claire pour démarrer vite."
+        actions={
+          <>
+            <ButtonLink href="/login">Se connecter</ButtonLink>
+            <ButtonLink href="/register" tone="secondary">
+              Créer un compte
+            </ButtonLink>
+          </>
+        }
+      />
+
+      <Section title="Briques incluses" description="Chaque zone est pensée pour être remplacée par votre métier, pas pour l’imposer.">
+        <div style={gridStyle}>
+          {starterFeatures.map((feature) => (
+            <Card key={feature} title={feature} description="Implémentation neutre, documentée et prête à brancher sur votre backend." />
+          ))}
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </Section>
+
+      <Section title="Parcours fournis" description="Des routes publiques et privées existent déjà pour accélérer la première intégration.">
+        <div style={gridStyle}>
+          <Card
+            title="Authentification"
+            description="Inscription, connexion, confirmation email, mot de passe oublié et reset."
+            footer={<Link href="/register">Voir les écrans auth</Link>}
+          />
+          <Card
+            title="Dashboard privé"
+            description="Protection SSR via proxy, contexte utilisateur hydraté côté serveur."
+            footer={<Link href="/dashboard">Ouvrir le dashboard</Link>}
+          />
+          <Card
+            title="Billing et média"
+            description="Pages shell pour préparer Stripe Embedded Checkout et upload direct navigateur."
+            footer={<Link href="/billing">Explorer les modules</Link>}
+          />
         </div>
-      </main>
-    </div>
+      </Section>
+    </>
   );
 }
+
+const gridStyle: React.CSSProperties = {
+  display: "grid",
+  gap: "1rem",
+  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+};

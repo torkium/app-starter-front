@@ -1,0 +1,21 @@
+services:
+  frontend:
+    build:
+      context: .
+      target: runner
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/runtime-config.js"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  tooling:
+    build:
+      context: .
+      target: builder
+    env_file:
+      - .env
