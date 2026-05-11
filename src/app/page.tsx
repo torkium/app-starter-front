@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { ButtonLink } from "@/design-system/components/Button";
-import { Card } from "@/design-system/components/Card";
-import { Section } from "@/design-system/layouts/Section";
+import { Card } from "@/design-system/molecules/Card";
+import { ButtonLink } from "@/design-system/primitives/atoms/Button";
+import { Section } from "@/design-system/organisms/Section";
 
 const starterFeatures = [
   "auth SSR par cookies httpOnly",
@@ -19,6 +19,7 @@ export default function HomePage() {
         eyebrow="App Front"
         title="Base Next.js générique prête pour des produits SaaS orientés User."
         description="Ce starter reprend les briques transversales utiles d’Akoky sans domaine dating, sans Profile, et avec une structure claire pour démarrer vite."
+        titleAs="h1"
         actions={
           <>
             <ButtonLink href="/login">Se connecter</ButtonLink>
@@ -29,7 +30,7 @@ export default function HomePage() {
         }
       />
 
-      <Section title="Briques incluses" description="Chaque zone est pensée pour être remplacée par votre métier, pas pour l’imposer.">
+      <Section title="Briques incluses" titleAs="h2" description="Chaque zone est pensée pour être remplacée par votre métier, pas pour l’imposer.">
         <div style={gridStyle}>
           {starterFeatures.map((feature) => (
             <Card key={feature} title={feature} description="Implémentation neutre, documentée et prête à brancher sur votre backend." />
@@ -37,7 +38,7 @@ export default function HomePage() {
         </div>
       </Section>
 
-      <Section title="Parcours fournis" description="Des routes publiques et privées existent déjà pour accélérer la première intégration.">
+      <Section title="Parcours fournis" titleAs="h2" description="Des routes publiques et privées existent déjà pour accélérer la première intégration.">
         <div style={gridStyle}>
           <Card
             title="Authentification"

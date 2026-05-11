@@ -19,3 +19,18 @@ services:
       target: builder
     env_file:
       - .env
+
+  storybook:
+    profiles:
+      - storybook
+    build:
+      context: .
+      target: deps
+    command: npm run storybook
+    env_file:
+      - .env
+    ports:
+      - "6006:6006"
+    volumes:
+      - .:/app
+      - /app/node_modules

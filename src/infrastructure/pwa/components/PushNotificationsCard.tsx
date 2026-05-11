@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@/design-system/components/Button";
-import { Card } from "@/design-system/components/Card";
-import { Notice } from "@/design-system/components/Notice";
+import { Card } from "@/design-system/molecules/Card";
+import { Notice } from "@/design-system/molecules/Notice";
+import { Button } from "@/design-system/primitives/atoms/Button";
 import { usePushNotifications } from "@/infrastructure/pwa/usePushNotifications";
 
 export function PushNotificationsCard({

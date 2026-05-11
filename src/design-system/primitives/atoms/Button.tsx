@@ -10,12 +10,11 @@ const baseStyle: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
-  gap: ".5rem",
-  borderRadius: "999px",
-  padding: ".85rem 1.25rem",
+  gap: "var(--space-2)",
+  borderRadius: "var(--radius-pill)",
+  padding: "var(--button-padding)",
   border: "1px solid transparent",
   fontWeight: 600,
-  transition: ".2s ease",
   cursor: "pointer",
 };
 
@@ -43,10 +42,15 @@ function getToneStyle(tone: ButtonTone = "primary"): React.CSSProperties {
 export function Button({
   children,
   tone = "primary",
+  className,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & { tone?: ButtonTone }) {
   return (
-    <button {...props} style={{ ...baseStyle, ...getToneStyle(tone), ...props.style }}>
+    <button
+      {...props}
+      className={cn("ui-button", "ui-focus-ring", className)}
+      style={{ ...baseStyle, ...getToneStyle(tone), ...props.style }}
+    >
       {children}
     </button>
   );
@@ -66,7 +70,7 @@ export function ButtonLink({
   return (
     <Link
       href={href}
-      className={cn(className)}
+      className={cn("ui-button-link", "ui-focus-ring", className)}
       style={{ ...baseStyle, ...getToneStyle(tone) }}
     >
       {children}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { EmptyState } from "@/design-system/components/EmptyState";
+import { EmptyState } from "@/design-system/molecules/EmptyState";
 
 export default function NotFound() {
   return (

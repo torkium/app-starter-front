@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import { Card } from "@/design-system/components/Card";
-import { Section } from "@/design-system/layouts/Section";
+import { Card } from "@/design-system/molecules/Card";
+import { Section } from "@/design-system/organisms/Section";
 import { listConsents, listLegalDocuments, listSessions } from "@/domains/account/server/account.server";
 import { getCurrentUser, requestEmailChange } from "@/infrastructure/auth/serverAuth";
 import { getLocale } from "@/infrastructure/i18n/serverLocale";

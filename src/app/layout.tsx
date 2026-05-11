@@ -3,7 +3,7 @@ import { Fraunces, Instrument_Sans } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { AppProviders } from "@/infrastructure/AppProviders";
-import { AppShell } from "@/design-system/layouts/AppShell";
+import { AppShell } from "@/features/shell/AppShell";
 import { getCurrentUser } from "@/infrastructure/auth/serverAuth";
 import { getLocale } from "@/infrastructure/i18n/serverLocale";
 

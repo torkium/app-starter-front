@@ -17,6 +17,7 @@ Use `starter_front` when you want a frontend foundation that already solves the 
 - realtime client wiring
 - cookie consent and PWA setup
 - neutral design system primitives
+- design-system hierarchy with primitives, molecules, organisms, and app feature wrappers
 
 The starter intentionally contains no dating-specific UI, no `Profile` concept, and no product-specific business pages.
 
@@ -36,6 +37,7 @@ The starter intentionally contains no dating-specific UI, no `Profile` concept, 
 - PWA install and push-notification foundations
 - Mercure client wiring
 - runtime public config endpoint
+- Storybook sandbox for design-system primitives
 - Vitest starter tests
 - Docker local setup and Make targets
 
@@ -64,6 +66,12 @@ make init
 make up
 ```
 
+Design-system sandbox in local dev:
+
+```bash
+make storybook
+```
+
 To turn this starter into a named project repository, run:
 
 ```bash
@@ -78,6 +86,7 @@ Local application:
 
 ```text
 http://localhost:3000
+http://localhost:6006
 ```
 
 ## Core Runtime Variables
@@ -99,6 +108,7 @@ make typecheck
 make test
 make validate-public-runtime
 make build
+make storybook-build
 make check
 ```
 
@@ -110,6 +120,7 @@ make config
 make restart
 make health
 make logs
+make logs-storybook
 make sh
 make tooling-sh
 ```

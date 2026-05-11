@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/design-system/components/Button";
-import { Card } from "@/design-system/components/Card";
-import { Field } from "@/design-system/components/Field";
-import { Input } from "@/design-system/components/Input";
-import { Notice } from "@/design-system/components/Notice";
-import { Section } from "@/design-system/layouts/Section";
+import { Card } from "@/design-system/molecules/Card";
+import { Field } from "@/design-system/molecules/Field";
+import { Notice } from "@/design-system/molecules/Notice";
+import { Button } from "@/design-system/primitives/atoms/Button";
+import { Input } from "@/design-system/primitives/atoms/Input";
+import { Section } from "@/design-system/organisms/Section";
 import { useDirectUpload } from "@/domains/media/hooks/useDirectUpload";
 import { mediaService } from "@/domains/media/services/media.service";
 import { getSafeMediaUrl } from "@/infrastructure/media/protection";

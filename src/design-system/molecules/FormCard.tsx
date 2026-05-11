@@ -1,4 +1,4 @@
-import { Card } from "@/design-system/components/Card";
+import { Card } from "@/design-system/molecules/Card";
 
 export function FormCard({
   title,

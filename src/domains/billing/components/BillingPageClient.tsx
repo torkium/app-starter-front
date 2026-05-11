@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/design-system/components/Button";
-import { Card } from "@/design-system/components/Card";
-import { Notice } from "@/design-system/components/Notice";
-import { Section } from "@/design-system/layouts/Section";
+import { Card } from "@/design-system/molecules/Card";
+import { Notice } from "@/design-system/molecules/Notice";
+import { Button } from "@/design-system/primitives/atoms/Button";
+import { Section } from "@/design-system/organisms/Section";
 import { billingService } from "@/domains/billing/services/billing.service";
 import type { BillingPlan, CurrentSubscription } from "@/shared/types/billing";
 

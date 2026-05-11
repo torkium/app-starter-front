@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { Button } from "@/design-system/components/Button";
-import { EmptyState } from "@/design-system/components/EmptyState";
+import { EmptyState } from "@/design-system/molecules/EmptyState";
+import { Button } from "@/design-system/primitives/atoms/Button";
 
 export default function Error({
   error,

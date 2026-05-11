@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FormCard } from "@/design-system/components/FormCard";
+import { FormCard } from "@/design-system/molecules/FormCard";
 
 export default function RegisterSuccessPage() {
   return (

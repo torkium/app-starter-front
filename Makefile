@@ -1,4 +1,5 @@
 COMPOSE = docker compose
+STORYBOOK_COMPOSE = $(COMPOSE) --profile storybook
 
 ensure-env:
 	@if [ ! -f .env ]; then \
@@ -28,6 +29,9 @@ config: ensure-env
 logs: ensure-env
 	$(COMPOSE) logs -f frontend
 
+logs-storybook: ensure-env
+	$(STORYBOOK_COMPOSE) logs -f storybook
+
 sh: ensure-env
 	$(COMPOSE) exec frontend sh
 
@@ -52,7 +56,13 @@ validate-public-runtime: ensure-env
 build: ensure-env
 	$(COMPOSE) run --rm tooling npm run build
 
+storybook: ensure-env
+	$(STORYBOOK_COMPOSE) up --build storybook
+
+storybook-build: ensure-env
+	$(STORYBOOK_COMPOSE) run --build --rm --no-deps storybook npm run build-storybook
+
 check: ensure-env
 	$(COMPOSE) run --rm tooling npm run check
 
-.PHONY: ensure-env init up down restart ps config logs sh tooling-sh health lint typecheck test validate-public-runtime build check
+.PHONY: ensure-env init up down restart ps config logs logs-storybook sh tooling-sh health lint typecheck test validate-public-runtime build storybook storybook-build check

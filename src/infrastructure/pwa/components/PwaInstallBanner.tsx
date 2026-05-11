@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/design-system/components/Button";
+import { Button } from "@/design-system/primitives/atoms/Button";
 
 export function PwaInstallBanner({
   canInstall,

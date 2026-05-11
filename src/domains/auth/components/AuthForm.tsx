@@ -2,11 +2,11 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { Button } from "@/design-system/components/Button";
-import { Field } from "@/design-system/components/Field";
-import { FormCard } from "@/design-system/components/FormCard";
-import { Input } from "@/design-system/components/Input";
-import { Notice } from "@/design-system/components/Notice";
+import { Field } from "@/design-system/molecules/Field";
+import { FormCard } from "@/design-system/molecules/FormCard";
+import { Notice } from "@/design-system/molecules/Notice";
+import { Button } from "@/design-system/primitives/atoms/Button";
+import { Input } from "@/design-system/primitives/atoms/Input";
 import { INITIAL_AUTH_ACTION_STATE, type AuthActionState } from "@/domains/auth/actionState";
 
 export interface AuthField {

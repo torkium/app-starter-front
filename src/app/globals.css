@@ -1,25 +1,4 @@
-:root {
-  --background: #f4f1ea;
-  --surface: rgba(255, 255, 255, 0.78);
-  --surface-strong: #fffdf8;
-  --surface-contrast: #1f2937;
-  --text: #172033;
-  --text-muted: #586174;
-  --border: rgba(23, 32, 51, 0.14);
-  --primary: #0f766e;
-  --primary-strong: #115e59;
-  --primary-soft: rgba(15, 118, 110, 0.12);
-  --danger: #b42318;
-  --warning: #b54708;
-  --success: #027a48;
-  --shadow: 0 24px 70px rgba(40, 52, 78, 0.12);
-  --radius-sm: 12px;
-  --radius-md: 18px;
-  --radius-lg: 28px;
-  --container: 1180px;
-  --font-sans: "Instrument Sans", "Segoe UI", sans-serif;
-  --font-display: "Fraunces", Georgia, serif;
-}
+@import "../design-system/primitives/tokens/theme.css";
 
 * {
   box-sizing: border-box;
@@ -50,6 +29,35 @@ input,
 textarea,
 select {
   font: inherit;
+}
+
+.ui-focus-ring:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.ui-button,
+.ui-button-link,
+.ui-ghost-toggle,
+.ui-input {
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.ui-button:hover,
+.ui-button-link:hover,
+.ui-ghost-toggle:hover {
+  transform: translateY(-1px);
+}
+
+.ui-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}
+
+.ui-input:focus-visible {
+  border-color: var(--focus-ring-strong);
+  box-shadow: 0 0 0 4px var(--focus-ring);
 }
 
 img {

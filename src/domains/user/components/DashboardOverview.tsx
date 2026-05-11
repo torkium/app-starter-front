@@ -1,7 +1,7 @@
 "use client";
 
-import { Card } from "@/design-system/components/Card";
-import { Section } from "@/design-system/layouts/Section";
+import { Card } from "@/design-system/molecules/Card";
+import { Section } from "@/design-system/organisms/Section";
 import { PushNotificationsCard } from "@/infrastructure/pwa/components/PushNotificationsCard";
 import { usePwa } from "@/infrastructure/pwa/PwaContext";
 import type { AuthenticatedUser } from "@/shared/types/auth";

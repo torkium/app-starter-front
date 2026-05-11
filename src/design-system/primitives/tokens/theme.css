@@ -1,0 +1,37 @@
+:root {
+  --background: #f4f1ea;
+  --surface: rgba(255, 255, 255, 0.78);
+  --surface-strong: #fffdf8;
+  --surface-contrast: #1f2937;
+  --text: #172033;
+  --text-muted: #586174;
+  --border: rgba(23, 32, 51, 0.14);
+  --primary: #0f766e;
+  --primary-strong: #115e59;
+  --primary-soft: rgba(15, 118, 110, 0.12);
+  --danger: #b42318;
+  --warning: #b54708;
+  --success: #027a48;
+  --shadow: 0 24px 70px rgba(40, 52, 78, 0.12);
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
+  --radius-pill: 999px;
+  --container: 1180px;
+  --font-sans: "Instrument Sans", "Segoe UI", sans-serif;
+  --font-display: "Fraunces", Georgia, serif;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --button-padding: 0.85rem 1.25rem;
+  --button-padding-compact: 0.65rem 0.9rem;
+  --input-padding: 0.9rem 1rem;
+  --input-background: rgba(255, 255, 255, 0.9);
+  --notice-info-background: rgba(15, 118, 110, 0.08);
+  --notice-success-background: rgba(2, 122, 72, 0.12);
+  --notice-warning-background: rgba(181, 71, 8, 0.12);
+  --notice-danger-background: rgba(180, 35, 24, 0.1);
+  --focus-ring: rgba(15, 118, 110, 0.36);
+  --focus-ring-strong: var(--primary);
+}
