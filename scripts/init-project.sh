@@ -108,6 +108,9 @@ INFRA_REPO="${INFRA_REPO:-${PROJECT_NAME}-infra}"
 PROJECT_TITLE="$(title_case "$PROJECT_NAME")"
 
 FILES=(
+  ".github/workflows/build-and-push.yml"
+  ".github/workflows/ci.yml"
+  ".storybook/preview.ts"
   "README.md"
   "package.json"
   "package-lock.json"
@@ -117,11 +120,16 @@ FILES=(
   "scripts/init.sh"
   "src/app/layout.tsx"
   "src/app/page.tsx"
-  "src/design-system/layouts/AppShell.tsx"
+  "src/app/runtime-config.js/route.ts"
+  "src/design-system/organisms/AppShell.tsx"
+  "src/design-system/organisms/AppShell.stories.tsx"
+  "src/features/shell/AppShell.tsx"
   "src/infrastructure/env/env.ts"
   "src/infrastructure/auth/cookies.ts"
   "src/infrastructure/http/requestContext.ts"
   "src/infrastructure/consent/consent.test.ts"
+  "src/infrastructure/env/env.test.ts"
+  "src/shared/types/runtime-env.d.ts"
   "src/proxy.ts"
 )
 
@@ -149,13 +157,14 @@ for file in "${FILES[@]}"; do
   replace_literal "$target" "starter_locale" "${PROJECT_NAME}_locale"
   replace_literal "$target" "starter_cookie_consent" "${PROJECT_NAME}_cookie_consent"
   replace_literal "$target" "starter.request_id" "${PROJECT_NAME}.request_id"
+  replace_literal "$target" "__STARTER_PUBLIC_CONFIG__" "__$(printf '%s' "$PROJECT_NAME" | tr '[:lower:]-' '[:upper:]_')_PUBLIC_CONFIG__"
 done
 
 replace_literal "${ROOT_DIR}/public/manifest.webmanifest" '"short_name": "Starter"' "\"short_name\": \"${PROJECT_TITLE}\""
 replace_literal "${ROOT_DIR}/public/manifest.webmanifest" '"short_name": "App"' "\"short_name\": \"${PROJECT_TITLE}\""
 
 cat <<EOF
-Project templating applied in starter_front.
+Project templating applied in ${FRONT_REPO}.
 
 Applied values:
 - project: ${PROJECT_NAME}
