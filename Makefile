@@ -1,5 +1,7 @@
 COMPOSE = docker compose
 STORYBOOK_COMPOSE = $(COMPOSE) --profile storybook
+export HOST_UID ?= $(shell id -u)
+export HOST_GID ?= $(shell id -g)
 
 ensure-env:
 	@if [ ! -f .env ]; then \
@@ -60,7 +62,7 @@ storybook: ensure-env
 	$(STORYBOOK_COMPOSE) up --build storybook
 
 storybook-build: ensure-env
-	$(STORYBOOK_COMPOSE) run --build --rm --no-deps storybook npm run build-storybook
+	$(STORYBOOK_COMPOSE) run --build --rm --no-deps storybook sh -lc 'npm run build-storybook && chown -R $(HOST_UID):$(HOST_GID) storybook-static'
 
 check: ensure-env
 	$(COMPOSE) run --rm tooling npm run check

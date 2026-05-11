@@ -53,6 +53,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Build Storybook
+        run: npm run build-storybook
+
   docker-runtime:
     name: Docker runtime smoke
     runs-on: ubuntu-latest

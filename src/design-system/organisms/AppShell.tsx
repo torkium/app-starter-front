@@ -1,11 +1,12 @@
 "use client";
 
+import type { Route } from "next";
 import Link from "next/link";
 import { Notice } from "@/design-system/molecules/Notice";
 import { Button, ButtonLink } from "@/design-system/primitives/atoms/Button";
 
 type AppShellNavItem = {
-  href: string;
+  href: Route;
   label: string;
 };
 
@@ -38,9 +39,9 @@ export function AppShellFrame({
   onDeclineCookies: () => void;
   pwaBanner?: React.ReactNode;
   navigationItems: AppShellNavItem[];
-  loginHref: string;
+  loginHref: Route;
   logoutAction: string;
-  brandHref?: string;
+  brandHref?: Route;
   brandLabel?: string;
   localeToggleLabel: string;
 }) {

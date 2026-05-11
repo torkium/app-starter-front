@@ -1,5 +1,6 @@
 "use client";
 
+import type { Route } from "next";
 import { useAuth } from "@/infrastructure/auth/AuthContext";
 import { useConsent } from "@/infrastructure/consent/ConsentContext";
 import { useI18n } from "@/infrastructure/i18n/I18nContext";
@@ -13,7 +14,7 @@ const shellNavigationItems = [
   { href: "/billing", label: "Billing" },
   { href: "/media", label: "Media" },
   { href: "/account", label: "Compte" },
-] as const;
+] satisfies ReadonlyArray<{ href: Route; label: string }>;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { user, isAuthenticated } = useAuth();

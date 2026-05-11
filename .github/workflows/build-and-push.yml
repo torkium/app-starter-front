@@ -117,6 +117,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Build Storybook
+        run: npm run build-storybook
+
       - name: Validate public runtime contract
         env:
           NEXT_PUBLIC_APP_NAME: Starter Front
@@ -209,6 +212,9 @@ jobs:
 
       - name: Tests
         run: npm run test
+
+      - name: Build Storybook
+        run: npm run build-storybook
 
       - name: Validate public runtime contract
         env:
