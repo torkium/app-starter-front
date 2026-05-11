@@ -64,6 +64,16 @@ make init
 make up
 ```
 
+To turn this starter into a named project repository, run:
+
+```bash
+./scripts/init-project.sh \
+  --project-name my-app \
+  --back-repo my-app-back \
+  --front-repo my-app-front \
+  --infra-repo my-app-infra
+```
+
 Local application:
 
 ```text
