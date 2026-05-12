@@ -43,6 +43,7 @@ const ALLOWED_REQUEST_HEADERS = new Set([
   "x-upload-token",
 ]);
 const ALLOWED_PROXY_PREFIXES = [
+  "account/me",
   "account/realtime/authorize",
   "billing/",
   "media/",
