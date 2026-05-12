@@ -1,5 +1,7 @@
 import { AuthForm } from "@/domains/auth/components/AuthForm";
 import { verifyEmailAction } from "@/domains/auth/actions";
+import { FormCard } from "@/design-system/molecules/FormCard";
+import { CleanAuthTokenUrl } from "@/domains/auth/components/CleanAuthTokenUrl";
 
 export default async function VerifyEmailPage({
   searchParams,
@@ -8,13 +10,31 @@ export default async function VerifyEmailPage({
 }) {
   const { token = "" } = await searchParams;
 
+  if (!token) {
+    return (
+      <FormCard title="Lien invalide" description="Le lien de confirmation est incomplet ou expiré.">
+        <p>Relancez la confirmation depuis votre espace.</p>
+      </FormCard>
+    );
+  }
+
+  async function submitWithToken(state: Parameters<typeof verifyEmailAction>[0], formData: FormData) {
+    "use server";
+
+    formData.set("token", token);
+    return verifyEmailAction(state, formData);
+  }
+
   return (
-    <AuthForm
-      title="Confirmer l'email"
-      description="Route minimale pour finaliser une confirmation de compte."
-      submitLabel="Confirmer"
-      action={verifyEmailAction}
-      fields={[{ name: "token", label: "Token", defaultValue: token }]}
-    />
+    <>
+      <CleanAuthTokenUrl />
+      <AuthForm
+        title="Confirmer l'email"
+        description="Route minimale pour finaliser une confirmation de compte."
+        submitLabel="Confirmer"
+        action={submitWithToken}
+        fields={[]}
+      />
+    </>
   );
 }

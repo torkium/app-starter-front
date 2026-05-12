@@ -23,8 +23,8 @@ function SubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
 
   return (
-    <Button type="submit" disabled={pending}>
-      {pending ? "Traitement..." : label}
+    <Button type="submit" loading={pending}>
+      {label}
     </Button>
   );
 }
@@ -35,6 +35,7 @@ export function AuthForm({
   submitLabel,
   fields,
   action,
+  notice,
   footer,
   hiddenFields,
 }: {
@@ -43,6 +44,7 @@ export function AuthForm({
   submitLabel: string;
   fields: AuthField[];
   action: (state: AuthActionState, formData: FormData) => Promise<AuthActionState>;
+  notice?: React.ReactNode;
   footer?: React.ReactNode;
   hiddenFields?: Array<{ name: string; value: string }>;
 }) {
@@ -51,6 +53,7 @@ export function AuthForm({
   return (
     <FormCard title={title} description={description} footer={footer}>
       <form action={formAction} style={{ display: "grid", gap: "1rem" }}>
+        {notice}
         {state.error ? (
           <Notice tone="danger">
             <strong>Action refusée.</strong> {state.error}
@@ -59,7 +62,7 @@ export function AuthForm({
         ) : null}
         {hiddenFields?.map((field) => <input key={field.name} type="hidden" name={field.name} value={field.value} />)}
         {fields.map((field) => (
-          <Field key={field.name} label={field.label} hint={field.hint}>
+          <Field key={field.name} label={field.label} hint={field.hint} required={field.required ?? true}>
             <Input
               name={field.name}
               type={field.type ?? "text"}

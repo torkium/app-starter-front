@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Fraunces, Instrument_Sans } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { AppProviders } from "@/infrastructure/AppProviders";
 import { AppShell } from "@/features/shell/AppShell";
@@ -22,6 +21,13 @@ export const metadata: Metadata = {
   description: "Frontend Next.js SSR, auth, proxy API, realtime et design system neutre.",
   applicationName: "App Front",
   manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+  },
 };
 
 export default async function RootLayout({
@@ -34,7 +40,9 @@ export default async function RootLayout({
   return (
     <html lang={locale} className={`${displayFont.variable} ${bodyFont.variable}`}>
       <body>
-        <Script src="/runtime-config.js" strategy="beforeInteractive" />
+        {/* Runtime public config must be available before client providers hydrate. */}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script src="/runtime-config.js" />
         <AppProviders initialUser={user} initialLocale={locale}>
           <AppShell>{children}</AppShell>
         </AppProviders>

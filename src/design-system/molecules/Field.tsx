@@ -4,11 +4,13 @@ export function Field({
   label,
   error,
   hint,
+  required,
   children,
 }: {
   label: string;
   error?: string | undefined;
   hint?: string | undefined;
+  required?: boolean | undefined;
   children: React.ReactElement;
 }) {
   const fieldId = useId();
@@ -31,6 +33,7 @@ export function Field({
       "aria-describedby": describedBy || undefined,
       "aria-errormessage": errorId,
       "aria-invalid": error ? true : childProps["aria-invalid"],
+      required: required || childProps.required ? true : undefined,
     });
   }
 

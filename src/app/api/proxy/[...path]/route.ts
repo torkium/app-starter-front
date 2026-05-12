@@ -42,10 +42,55 @@ const ALLOWED_REQUEST_HEADERS = new Set([
   "range",
   "x-upload-token",
 ]);
+const ALLOWED_PROXY_PREFIXES = [
+  "account/realtime/authorize",
+  "billing/",
+  "media/",
+  "notifications/push/subscriptions",
+];
 
 function buildTarget(path: string[]): string {
-  const normalized = path.join("/");
+  const normalized = path.map((segment) => encodeURIComponent(segment)).join("/");
   return `${env.API_BASE_URL}/${normalized}`;
+}
+
+function isAllowedProxyPath(path: string[]): boolean {
+  const normalized = path.join("/");
+  return ALLOWED_PROXY_PREFIXES.some((prefix) => normalized === prefix || normalized.startsWith(prefix));
+}
+
+function normalizeProxyPath(path: string[]): string[] | null {
+  if (path.length === 0) {
+    return null;
+  }
+
+  const normalizedPath: string[] = [];
+
+  for (const segment of path) {
+    let decodedSegment: string;
+
+    try {
+      decodedSegment = decodeURIComponent(segment);
+    } catch {
+      return null;
+    }
+
+    if (
+      decodedSegment === "" ||
+      decodedSegment === "." ||
+      decodedSegment === ".." ||
+      decodedSegment.includes("/") ||
+      decodedSegment.includes("\\") ||
+      decodedSegment.includes("?") ||
+      decodedSegment.includes("#")
+    ) {
+      return null;
+    }
+
+    normalizedPath.push(decodedSegment);
+  }
+
+  return normalizedPath;
 }
 
 function getForwardHeaders(request: NextRequest, accessToken?: string): Headers {
@@ -209,16 +254,17 @@ function buildResponseHeaders(response: Response): Headers {
 
   headers.set("Cache-Control", "no-store");
 
-  const setCookieHeaders = (response.headers as Headers & { getSetCookie?: () => string[] }).getSetCookie?.() ?? [];
-  for (const value of setCookieHeaders) {
-    headers.append("Set-Cookie", value);
-  }
-
   return headers;
 }
 
 async function proxyRequest(request: NextRequest, path: string[]): Promise<NextResponse> {
   const requestId = request.headers.get(REQUEST_ID_HEADER) ?? createRequestId();
+  const normalizedPath = normalizeProxyPath(path);
+
+  if (!normalizedPath || !isAllowedProxyPath(normalizedPath)) {
+    return NextResponse.json({ error: "Proxy path not allowed" }, { status: 404, headers: { [REQUEST_ID_HEADER]: requestId } });
+  }
+
   const body = request.method === "GET" || request.method === "HEAD" ? undefined : await request.arrayBuffer();
   const session = await resolveAccessToken(requestId);
   let accessToken = session.accessToken;
@@ -226,7 +272,20 @@ async function proxyRequest(request: NextRequest, path: string[]): Promise<NextR
   let clearSession = session.clearSession;
   let refreshState = session.refreshState;
 
-  let response = await sendToBackend(request, path, body, accessToken);
+  if (!accessToken) {
+    const unauthorizedResponse = NextResponse.json(
+      { error: "Authentication required" },
+      { status: 401, headers: { "Cache-Control": "no-store", [REQUEST_ID_HEADER]: requestId } },
+    );
+
+    if (clearSession) {
+      clearSessionCookies(unauthorizedResponse);
+    }
+
+    return unauthorizedResponse;
+  }
+
+  let response = await sendToBackend(request, normalizedPath, body, accessToken);
   if ((response.status === 401 || response.status === 403) && !refreshedTokens) {
     const refreshToken = (await cookies()).get(REFRESH_COOKIE)?.value;
     if (refreshToken) {
@@ -235,7 +294,7 @@ async function proxyRequest(request: NextRequest, path: string[]): Promise<NextR
         refreshedTokens = refreshResult.tokens;
         accessToken = refreshResult.tokens.access_token;
         refreshState = refreshResult.kind;
-        response = await sendToBackend(request, path, body, accessToken);
+        response = await sendToBackend(request, normalizedPath, body, accessToken);
       } else if (refreshResult.kind === "auth_failed") {
         refreshState = refreshResult.kind;
         clearSession = true;

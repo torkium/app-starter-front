@@ -5,11 +5,20 @@ const isProduction = process.env.NODE_ENV === "production";
 const nextConfig: NextConfig = {
   typedRoutes: true,
   output: "standalone",
+  devIndicators: false,
+  allowedDevOrigins: ["app.local", "localhost"],
   images: {
     unoptimized: true,
   },
   async headers() {
     return [
+      {
+        source: "/sw.js",
+        headers: [
+          { key: "Cache-Control", value: "no-store, no-cache, must-revalidate" },
+          { key: "Service-Worker-Allowed", value: "/" },
+        ],
+      },
       {
         source: "/:path*",
         headers: [

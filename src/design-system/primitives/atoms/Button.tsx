@@ -42,15 +42,22 @@ function getToneStyle(tone: ButtonTone = "primary"): React.CSSProperties {
 export function Button({
   children,
   tone = "primary",
+  loading = false,
   className,
+  disabled,
   ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & { tone?: ButtonTone }) {
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & { tone?: ButtonTone; loading?: boolean }) {
+  const isDisabled = disabled || loading;
+
   return (
     <button
       {...props}
+      aria-busy={loading || undefined}
       className={cn("ui-button", "ui-focus-ring", className)}
+      disabled={isDisabled}
       style={{ ...baseStyle, ...getToneStyle(tone), ...props.style }}
     >
+      {loading ? <span className="ui-button__spinner" aria-hidden="true" /> : null}
       {children}
     </button>
   );

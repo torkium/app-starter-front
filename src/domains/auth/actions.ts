@@ -4,7 +4,9 @@ import type { Route } from "next";
 import { redirect } from "next/navigation";
 import type { AuthActionState } from "@/domains/auth/actionState";
 import { ApiError } from "@/infrastructure/errors/apiError";
-import { clearSession, confirmEmailChange, loginWithCredentials, registerWithCredentials, requestEmailChange, requestPasswordReset, resetPassword, verifyEmail } from "@/infrastructure/auth/serverAuth";
+import { clearSession, confirmEmailChange, getCurrentUser, loginWithCredentials, registerWithCredentials, requestEmailChange, requestPasswordReset, resetPassword, verifyEmail } from "@/infrastructure/auth/serverAuth";
+
+const ALLOWED_REDIRECT_PREFIXES = ["/account", "/billing", "/dashboard", "/media"] as const;
 
 function getString(formData: FormData, key: string): string {
   const value = formData.get(key);
@@ -12,8 +14,21 @@ function getString(formData: FormData, key: string): string {
 }
 
 function normalizeRedirectTarget(target: string): Route {
-  if (target.startsWith("/") && !target.startsWith("//")) {
-    return target as Route;
+  if (!target.startsWith("/") || target.startsWith("//")) {
+    return "/dashboard" as Route;
+  }
+
+  try {
+    const url = new URL(target, "https://app.local");
+    const isAllowedDestination = ALLOWED_REDIRECT_PREFIXES.some(
+      (path) => url.pathname === path || url.pathname.startsWith(`${path}/`),
+    );
+
+    if (isAllowedDestination) {
+      return `${url.pathname}${url.search}${url.hash}` as Route;
+    }
+  } catch {
+    return "/dashboard" as Route;
   }
 
   return "/dashboard" as Route;
@@ -107,6 +122,8 @@ export async function verifyEmailAction(_: AuthActionState, formData: FormData):
 }
 
 export async function confirmEmailChangeAction(_: AuthActionState, formData: FormData): Promise<AuthActionState> {
+  const user = await getCurrentUser();
+
   try {
     await confirmEmailChange({
       token: getString(formData, "token"),
@@ -115,7 +132,7 @@ export async function confirmEmailChangeAction(_: AuthActionState, formData: For
     return toAuthActionState(error);
   }
 
-  redirect("/account?emailChanged=success");
+  redirect(user ? "/account?emailChanged=success" : "/login?emailChanged=success");
 }
 
 export async function requestEmailChangeAction(_: AuthActionState, formData: FormData): Promise<AuthActionState> {

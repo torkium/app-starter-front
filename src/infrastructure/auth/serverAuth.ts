@@ -107,7 +107,7 @@ async function refreshSessionInternal(): Promise<AuthTokensResponse | null> {
   }
 }
 
-async function ensureFreshAccessToken(): Promise<string | undefined> {
+async function getStoredAccessToken(): Promise<string | undefined> {
   const jar = await cookies();
   const accessToken = jar.get(ACCESS_COOKIE)?.value;
 
@@ -115,21 +115,7 @@ async function ensureFreshAccessToken(): Promise<string | undefined> {
     return accessToken;
   }
 
-  const refreshToken = jar.get(REFRESH_COOKIE)?.value;
-  if (!refreshToken) {
-    if (accessToken) {
-      await clearSession();
-    }
-
-    return undefined;
-  }
-
-  const refreshedTokens = await refreshSessionInternal();
-  if (!refreshedTokens?.access_token) {
-    return undefined;
-  }
-
-  return refreshedTokens.access_token;
+  return undefined;
 }
 
 export async function clearSession(): Promise<void> {
@@ -207,11 +193,11 @@ export async function refreshSession(): Promise<boolean> {
 }
 
 export async function getAccessToken(): Promise<string | undefined> {
-  return ensureFreshAccessToken();
+  return getStoredAccessToken();
 }
 
 export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
-  const accessToken = await ensureFreshAccessToken();
+  const accessToken = await getStoredAccessToken();
   if (!accessToken) {
     return null;
   }
@@ -223,30 +209,7 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
     });
   } catch (error) {
     if (error instanceof ApiError && (error.status === 401 || error.status === 403)) {
-      const refreshed = await refreshSession();
-      if (!refreshed) {
-        return null;
-      }
-
-      const nextAccessToken = (await cookies()).get(ACCESS_COOKIE)?.value;
-      if (!nextAccessToken) {
-        await clearSession();
-        return null;
-      }
-
-      try {
-        return await fetchJson<AuthenticatedUser>(`${env.API_BASE_URL}${env.API_ME_PATH}`, {
-          method: "GET",
-          accessToken: nextAccessToken,
-        });
-      } catch (retryError) {
-        if (retryError instanceof ApiError && (retryError.status === 401 || retryError.status === 403)) {
-          await clearSession();
-          return null;
-        }
-
-        throw retryError;
-      }
+      return null;
     }
 
     throw error;

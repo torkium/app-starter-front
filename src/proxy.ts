@@ -2,6 +2,19 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { REQUEST_ID_HEADER, createRequestId } from "@/infrastructure/http/requestContext";
 import { env } from "@/infrastructure/env/env";
+import { ACCESS_COOKIE, REFRESH_COOKIE, SESSION_COOKIE } from "@/infrastructure/auth/cookies";
+
+interface AuthTokensResponse {
+  access_token?: string;
+  refresh_token?: string;
+  session_id?: string;
+  expires_in?: number;
+}
+
+type RefreshResult =
+  | { kind: "ok"; tokens: AuthTokensResponse }
+  | { kind: "auth_failed" }
+  | { kind: "transient_failed" };
 
 const PUBLIC_PATHS = [
   "/",
@@ -10,10 +23,18 @@ const PUBLIC_PATHS = [
   "/forgot-password",
   "/reset-password",
   "/verify-email",
+  "/confirm-email-change",
 ];
+const NONCE_HEADER = "x-nonce";
+const PUBLIC_ASSET_PATHS = ["/favicon.ico", "/manifest.webmanifest", "/runtime-config.js", "/sw.js"];
+const PUBLIC_ASSET_PREFIXES = ["/brand/", "/images/", "/icons/"];
 
 function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+}
+
+function isPublicAssetPath(pathname: string): boolean {
+  return PUBLIC_ASSET_PATHS.includes(pathname) || PUBLIC_ASSET_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
 function hasUsableAccessToken(token?: string): boolean {
@@ -38,6 +59,76 @@ function hasUsableAccessToken(token?: string): boolean {
   }
 }
 
+async function refreshAccessToken(refreshToken: string, requestId: string): Promise<RefreshResult> {
+  try {
+    const response = await fetch(`${env.API_BASE_URL}${env.API_REFRESH_PATH}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        [REQUEST_ID_HEADER]: requestId,
+      },
+      body: JSON.stringify({ refreshToken }),
+      cache: "no-store",
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      return { kind: "auth_failed" };
+    }
+
+    if (!response.ok) {
+      return { kind: "transient_failed" };
+    }
+
+    return { kind: "ok", tokens: (await response.json()) as AuthTokensResponse };
+  } catch {
+    return { kind: "transient_failed" };
+  }
+}
+
+function applySessionCookies(response: NextResponse, tokens: AuthTokensResponse): void {
+  if (tokens.access_token) {
+    response.cookies.set(ACCESS_COOKIE, tokens.access_token, {
+      httpOnly: true,
+      secure: env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: tokens.expires_in ?? 60 * 60,
+    });
+  }
+
+  if (tokens.refresh_token) {
+    response.cookies.set(REFRESH_COOKIE, tokens.refresh_token, {
+      httpOnly: true,
+      secure: env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60,
+    });
+  }
+
+  if (tokens.session_id) {
+    response.cookies.set(SESSION_COOKIE, tokens.session_id, {
+      httpOnly: true,
+      secure: env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60,
+    });
+  }
+}
+
+function clearSessionCookies(response: NextResponse): void {
+  for (const name of [ACCESS_COOKIE, REFRESH_COOKIE, SESSION_COOKIE]) {
+    response.cookies.set(name, "", {
+      httpOnly: true,
+      secure: env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 0,
+    });
+  }
+}
+
 function toOrigin(input: string | undefined): string | null {
   if (!input) {
     return null;
@@ -50,7 +141,7 @@ function toOrigin(input: string | undefined): string | null {
   }
 }
 
-function buildSecurityHeaders(request: NextRequest): Headers {
+function buildSecurityHeaders(request: NextRequest, nonce: string): Headers {
   const isProduction = process.env.NODE_ENV === "production";
   const appOrigin = request.nextUrl.origin;
   const mercureOrigin = toOrigin(env.NEXT_PUBLIC_MERCURE_URL);
@@ -60,6 +151,7 @@ function buildSecurityHeaders(request: NextRequest): Headers {
   const connectSrc = new Set(["'self'", appOrigin]);
   const imgSrc = new Set(["'self'", "blob:"]);
   const mediaSrc = new Set(["'self'", "blob:"]);
+  const scriptSrc = new Set(["'self'", `'nonce-${nonce}'`]);
 
   for (const origin of [mercureOrigin, mediaOrigin, mediaUploadOrigin]) {
     if (origin) {
@@ -81,6 +173,8 @@ function buildSecurityHeaders(request: NextRequest): Headers {
     imgSrc.add("https:");
     mediaSrc.add("http:");
     mediaSrc.add("https:");
+    scriptSrc.add("'unsafe-inline'");
+    scriptSrc.add("'unsafe-eval'");
   }
 
   const headers = new Headers();
@@ -98,8 +192,10 @@ function buildSecurityHeaders(request: NextRequest): Headers {
       `img-src ${Array.from(imgSrc).join(" ")}`,
       `media-src ${Array.from(mediaSrc).join(" ")}`,
       "font-src 'self' data: https://fonts.gstatic.com",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "script-src 'self'",
+      "style-src 'self' https://fonts.googleapis.com",
+      "style-src-elem 'self' https://fonts.googleapis.com",
+      "style-src-attr 'unsafe-inline'",
+      `script-src ${Array.from(scriptSrc).join(" ")}`,
     ].join("; "),
   );
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
@@ -114,22 +210,24 @@ function buildSecurityHeaders(request: NextRequest): Headers {
   return headers;
 }
 
-function applySecurityHeaders(response: NextResponse, request: NextRequest): NextResponse {
-  for (const [key, value] of buildSecurityHeaders(request).entries()) {
+function applySecurityHeaders(response: NextResponse, request: NextRequest, nonce: string): NextResponse {
+  for (const [key, value] of buildSecurityHeaders(request, nonce).entries()) {
     response.headers.set(key, value);
   }
 
   return response;
 }
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const accessToken = request.cookies.get("starter_access_token")?.value;
-  const refreshToken = request.cookies.get("starter_refresh_token")?.value;
-  const authenticatedForGuard = hasUsableAccessToken(accessToken) || Boolean(refreshToken);
+  const nonce = btoa(crypto.randomUUID());
+  const accessToken = request.cookies.get(ACCESS_COOKIE)?.value;
+  const refreshToken = request.cookies.get(REFRESH_COOKIE)?.value;
+  const authenticatedForGuard = hasUsableAccessToken(accessToken);
   const requestId = request.headers.get(REQUEST_ID_HEADER) ?? createRequestId();
   const forwardedHeaders = new Headers(request.headers);
   forwardedHeaders.set(REQUEST_ID_HEADER, requestId);
+  forwardedHeaders.set(NONCE_HEADER, nonce);
 
   const nextResponse = NextResponse.next({
     request: {
@@ -141,31 +239,56 @@ export function proxy(request: NextRequest) {
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
-    pathname.startsWith("/icons") ||
-    pathname === "/manifest.webmanifest" ||
-    pathname === "/sw.js" ||
-    pathname === "/favicon.ico"
+    isPublicAssetPath(pathname)
   ) {
-    return applySecurityHeaders(nextResponse, request);
+    return applySecurityHeaders(nextResponse, request, nonce);
+  }
+
+  if (!authenticatedForGuard && refreshToken) {
+    const refreshResult = await refreshAccessToken(refreshToken, requestId);
+
+    if (refreshResult.kind === "ok" && hasUsableAccessToken(refreshResult.tokens.access_token)) {
+      const target = isPublicPath(pathname) && pathname !== "/confirm-email-change"
+        ? new URL("/dashboard", request.url)
+        : request.nextUrl;
+      const refreshResponse = NextResponse.redirect(target);
+      refreshResponse.headers.set(REQUEST_ID_HEADER, requestId);
+      applySessionCookies(refreshResponse, refreshResult.tokens);
+      return applySecurityHeaders(refreshResponse, request, nonce);
+    }
+
+    if (refreshResult.kind === "auth_failed") {
+      const clearResponse = isPublicPath(pathname)
+        ? nextResponse
+        : NextResponse.redirect(new URL("/login", request.url));
+      clearResponse.headers.set(REQUEST_ID_HEADER, requestId);
+      clearSessionCookies(clearResponse);
+      return applySecurityHeaders(clearResponse, request, nonce);
+    }
   }
 
   if (!authenticatedForGuard && !isPublicPath(pathname)) {
     const url = new URL("/login", request.url);
-    url.searchParams.set("redirect", pathname);
+    url.searchParams.set("redirect", `${pathname}${request.nextUrl.search}`);
     const redirectResponse = NextResponse.redirect(url);
     redirectResponse.headers.set(REQUEST_ID_HEADER, requestId);
-    return applySecurityHeaders(redirectResponse, request);
+    return applySecurityHeaders(redirectResponse, request, nonce);
   }
 
-  if (hasUsableAccessToken(accessToken) && isPublicPath(pathname) && pathname !== "/") {
+  if (
+    hasUsableAccessToken(accessToken) &&
+    isPublicPath(pathname) &&
+    pathname !== "/" &&
+    pathname !== "/confirm-email-change"
+  ) {
     const redirectResponse = NextResponse.redirect(new URL("/dashboard", request.url));
     redirectResponse.headers.set(REQUEST_ID_HEADER, requestId);
-    return applySecurityHeaders(redirectResponse, request);
+    return applySecurityHeaders(redirectResponse, request, nonce);
   }
 
-  return applySecurityHeaders(nextResponse, request);
+  return applySecurityHeaders(nextResponse, request, nonce);
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|.*\\..*).*)"],
+  matcher: ["/((?!_next/static|_next/image|_next/webpack-hmr).*)"],
 };

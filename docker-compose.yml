@@ -1,4 +1,20 @@
 services:
+  frontend-dev:
+    profiles:
+      - dev
+    build:
+      context: .
+      target: dev
+    command: npm run dev
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+
   frontend:
     build:
       context: .
@@ -8,7 +24,7 @@ services:
     env_file:
       - .env
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3000/runtime-config.js"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/runtime-config.js"]
       interval: 10s
       timeout: 5s
       retries: 6
