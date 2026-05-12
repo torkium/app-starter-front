@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Fraunces, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "@/infrastructure/AppProviders";
-import { AppShell } from "@/features/shell/AppShell";
 import { getCurrentUser } from "@/infrastructure/auth/serverAuth";
 import { getLocale } from "@/infrastructure/i18n/serverLocale";
 
@@ -43,9 +42,7 @@ export default async function RootLayout({
         {/* Runtime public config must be available before client providers hydrate. */}
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script src="/runtime-config.js" />
-        <AppProviders initialUser={user} initialLocale={locale}>
-          <AppShell>{children}</AppShell>
-        </AppProviders>
+        <AppProviders initialUser={user} initialLocale={locale}>{children}</AppProviders>
       </body>
     </html>
   );

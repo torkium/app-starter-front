@@ -129,6 +129,7 @@ FILES=(
   "src/infrastructure/http/requestContext.ts"
   "src/infrastructure/consent/consent.test.ts"
   "src/infrastructure/env/env.test.ts"
+  "src/infrastructure/pwa/PwaContext.tsx"
   "src/shared/types/runtime-env.d.ts"
   "src/proxy.ts"
 )
@@ -156,6 +157,8 @@ for file in "${FILES[@]}"; do
   replace_literal "$target" "starter_session_id" "${PROJECT_NAME}_session_id"
   replace_literal "$target" "starter_locale" "${PROJECT_NAME}_locale"
   replace_literal "$target" "starter_cookie_consent" "${PROJECT_NAME}_cookie_consent"
+  replace_literal "$target" "starter:pwa-install-dismissed" "${PROJECT_NAME}:pwa-install-dismissed"
+  replace_literal "$target" "starter:pwa-install-dismissed-changed" "${PROJECT_NAME}:pwa-install-dismissed-changed"
   replace_literal "$target" "starter.request_id" "${PROJECT_NAME}.request_id"
   replace_literal "$target" "__STARTER_PUBLIC_CONFIG__" "__$(printf '%s' "$PROJECT_NAME" | tr '[:lower:]-' '[:upper:]_')_PUBLIC_CONFIG__"
 done
