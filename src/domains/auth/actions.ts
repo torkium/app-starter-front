@@ -36,15 +36,21 @@ function normalizeRedirectTarget(target: string): Route {
 
 function toAuthActionState(error: unknown): AuthActionState {
   if (error instanceof ApiError) {
+    const message = error.status === 401
+      ? "Email ou mot de passe incorrect."
+      : error.status === 429
+        ? "Trop de tentatives. Réessayez dans quelques instants."
+        : "L’action n’a pas pu aboutir pour le moment. Réessayez dans quelques instants.";
+
     return {
-      error: error.message,
+      error: message,
       requestId: error.requestId ?? null,
     };
   }
 
   if (error instanceof Error) {
     return {
-      error: error.message,
+      error: "L’action n’a pas pu aboutir pour le moment. Réessayez dans quelques instants.",
       requestId: null,
     };
   }
