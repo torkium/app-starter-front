@@ -1,7 +1,8 @@
-import { AuthForm } from "@/domains/auth/components/AuthForm";
-import { confirmEmailChangeAction } from "@/domains/auth/actions";
+import { redirect } from "next/navigation";
 import { FormCard } from "@/design-system/molecules/FormCard";
 import { CleanAuthTokenUrl } from "@/domains/auth/components/CleanAuthTokenUrl";
+import { confirmEmailChange, getCurrentUser } from "@/infrastructure/auth/serverAuth";
+import { ApiError } from "@/infrastructure/errors/apiError";
 
 export default async function ConfirmEmailChangePage({
   searchParams,
@@ -18,23 +19,25 @@ export default async function ConfirmEmailChangePage({
     );
   }
 
-  async function submitWithToken(state: Parameters<typeof confirmEmailChangeAction>[0], formData: FormData) {
-    "use server";
+  const user = await getCurrentUser();
+  let error: ApiError | null = null;
+  try {
+    await confirmEmailChange({ token });
+  } catch (caught) {
+    error = caught instanceof ApiError ? caught : new ApiError("Le lien de confirmation est invalide ou expiré.");
+  }
 
-    formData.set("token", token);
-    return confirmEmailChangeAction(state, formData);
+  if (!error) {
+    redirect(user ? "/account?emailChanged=success" : "/login?emailChanged=success");
   }
 
   return (
     <>
       <CleanAuthTokenUrl />
-      <AuthForm
-        title="Confirmer le changement d'email"
-        description="Valide la nouvelle adresse email du compte."
-        submitLabel="Confirmer"
-        action={submitWithToken}
-        fields={[]}
-      />
+      <FormCard title="Lien invalide" description="Le lien de confirmation est invalide ou expiré.">
+        <p>Demandez un nouveau changement d’email depuis les paramètres du compte.</p>
+        {error.requestId ? <p>Référence: {error.requestId}</p> : null}
+      </FormCard>
     </>
   );
 }

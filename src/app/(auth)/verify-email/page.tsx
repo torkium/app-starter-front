@@ -1,7 +1,8 @@
-import { AuthForm } from "@/domains/auth/components/AuthForm";
-import { verifyEmailAction } from "@/domains/auth/actions";
+import { redirect } from "next/navigation";
 import { FormCard } from "@/design-system/molecules/FormCard";
 import { CleanAuthTokenUrl } from "@/domains/auth/components/CleanAuthTokenUrl";
+import { verifyEmail } from "@/infrastructure/auth/serverAuth";
+import { ApiError } from "@/infrastructure/errors/apiError";
 
 export default async function VerifyEmailPage({
   searchParams,
@@ -18,23 +19,24 @@ export default async function VerifyEmailPage({
     );
   }
 
-  async function submitWithToken(state: Parameters<typeof verifyEmailAction>[0], formData: FormData) {
-    "use server";
+  let error: ApiError | null = null;
+  try {
+    await verifyEmail({ token });
+  } catch (caught) {
+    error = caught instanceof ApiError ? caught : new ApiError("Le lien de confirmation est invalide ou expiré.");
+  }
 
-    formData.set("token", token);
-    return verifyEmailAction(state, formData);
+  if (!error) {
+    redirect("/verify-email/success");
   }
 
   return (
     <>
       <CleanAuthTokenUrl />
-      <AuthForm
-        title="Confirmer l'email"
-        description="Route minimale pour finaliser une confirmation de compte."
-        submitLabel="Confirmer"
-        action={submitWithToken}
-        fields={[]}
-      />
+      <FormCard title="Lien invalide" description="Le lien de confirmation est invalide ou expiré.">
+        <p>Relancez la confirmation depuis votre espace.</p>
+        {error.requestId ? <p>Référence: {error.requestId}</p> : null}
+      </FormCard>
     </>
   );
 }
