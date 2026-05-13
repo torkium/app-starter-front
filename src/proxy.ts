@@ -275,17 +275,6 @@ export async function proxy(request: NextRequest) {
     return applySecurityHeaders(redirectResponse, request, nonce);
   }
 
-  if (
-    hasUsableAccessToken(accessToken) &&
-    isPublicPath(pathname) &&
-    pathname !== "/" &&
-    pathname !== "/confirm-email-change"
-  ) {
-    const redirectResponse = NextResponse.redirect(new URL("/dashboard", request.url));
-    redirectResponse.headers.set(REQUEST_ID_HEADER, requestId);
-    return applySecurityHeaders(redirectResponse, request, nonce);
-  }
-
   return applySecurityHeaders(nextResponse, request, nonce);
 }
 

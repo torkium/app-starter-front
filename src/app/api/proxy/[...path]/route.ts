@@ -108,6 +108,10 @@ function getForwardHeaders(request: NextRequest, accessToken?: string): Headers 
     forwarded.set("Authorization", `Bearer ${accessToken}`);
   }
 
+  forwarded.set("X-Forwarded-Host", request.headers.get("host") ?? request.nextUrl.host);
+  forwarded.set("X-Forwarded-Proto", request.nextUrl.protocol.replace(":", ""));
+  forwarded.set("X-Forwarded-Port", request.nextUrl.port || (request.nextUrl.protocol === "https:" ? "443" : "80"));
+
   if (!forwarded.has(REQUEST_ID_HEADER)) {
     forwarded.set(REQUEST_ID_HEADER, request.headers.get(REQUEST_ID_HEADER) ?? createRequestId());
   }
@@ -258,6 +262,23 @@ function buildResponseHeaders(response: Response): Headers {
   return headers;
 }
 
+function appendBackendSetCookieHeaders(response: Response, proxiedResponse: NextResponse): void {
+  const headers = response.headers as Headers & { getSetCookie?: () => string[] };
+  const setCookieHeaders = headers.getSetCookie?.();
+
+  if (setCookieHeaders?.length) {
+    for (const setCookie of setCookieHeaders) {
+      proxiedResponse.headers.append("Set-Cookie", setCookie);
+    }
+    return;
+  }
+
+  const setCookie = response.headers.get("set-cookie");
+  if (setCookie) {
+    proxiedResponse.headers.append("Set-Cookie", setCookie);
+  }
+}
+
 async function proxyRequest(request: NextRequest, path: string[]): Promise<NextResponse> {
   const requestId = request.headers.get(REQUEST_ID_HEADER) ?? createRequestId();
   const normalizedPath = normalizeProxyPath(path);
@@ -313,6 +334,7 @@ async function proxyRequest(request: NextRequest, path: string[]): Promise<NextR
     status: response.status,
     headers: buildResponseHeaders(response),
   });
+  appendBackendSetCookieHeaders(response, proxiedResponse);
   proxiedResponse.headers.set(REQUEST_ID_HEADER, response.headers.get(REQUEST_ID_HEADER) ?? requestId);
 
   if (refreshedTokens) {
