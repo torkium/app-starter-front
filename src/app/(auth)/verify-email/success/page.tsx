@@ -1,16 +1,16 @@
 import Link from "next/link";
-import { FormCard } from "@/design-system/molecules/FormCard";
+import { AuthPanel } from "@/design-system/molecules/AuthPanel";
 
 export default function VerifyEmailSuccessPage() {
   return (
-    <FormCard
+    <AuthPanel
       title="Email confirmé"
-      description="Le compte peut maintenant accéder aux parties réservées."
+      description="Votre adresse email est validée. Vous pouvez accéder à votre espace My App."
       footer={<Link href="/dashboard">Accéder au dashboard</Link>}
     >
-      <p style={{ margin: 0, color: "var(--text-muted)" }}>
-        Utilisez cette étape pour afficher un onboarding ou un rappel d’abonnement.
+      <p className="ui-auth-panel__text">
+        Votre espace applicatif peut maintenant commencer dans de bonnes conditions.
       </p>
-    </FormCard>
+    </AuthPanel>
   );
 }

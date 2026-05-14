@@ -1,19 +1,18 @@
 import { cn } from "@/shared/utils/cn";
 
-export function Input({ className, style, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
+export type InputSize = "sm" | "md" | "lg";
+
+export type InputProps = React.ComponentPropsWithRef<"input"> & {
+  controlSize?: InputSize;
+};
+
+export function Input({ className, controlSize = "md", ref, ...props }: InputProps) {
   return (
     <input
       {...props}
-      className={cn("ui-input", "ui-focus-ring", className)}
-      style={{
-        width: "100%",
-        borderRadius: "var(--radius-sm)",
-        border: "1px solid var(--border)",
-        padding: "var(--input-padding)",
-        background: "var(--input-background)",
-        color: "var(--text)",
-        ...style,
-      }}
+      ref={ref}
+      className={cn("ui-input", "ui-field-control", className)}
+      data-size={controlSize}
     />
   );
 }

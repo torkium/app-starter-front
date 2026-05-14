@@ -14,11 +14,11 @@ const preview: Preview = {
       },
     },
     backgrounds: {
-      default: "starter-canvas",
+      default: "app-canvas",
       values: [
-        { name: "starter-canvas", value: "#f8f5ef" },
+        { name: "app-canvas", value: "#fbf7ef" },
         { name: "paper", value: "#fffdf8" },
-        { name: "ink", value: "#172033" },
+        { name: "ink", value: "#18231d" },
       ],
     },
   },

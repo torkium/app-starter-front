@@ -3,7 +3,8 @@
 import type { Route } from "next";
 import Link from "next/link";
 import { Notice } from "@/design-system/molecules/Notice";
-import { Button, ButtonLink } from "@/design-system/primitives/atoms/Button";
+import { Button } from "@/design-system/primitives/atoms/Button";
+import { ButtonLink } from "@/design-system/primitives/atoms/ButtonLink";
 
 type AppShellNavItem = {
   href: Route;
@@ -25,7 +26,7 @@ export function AppShellFrame({
   loginHref,
   logoutAction,
   brandHref = "/",
-  brandLabel = "App Front",
+  brandLabel = "My App",
   localeToggleLabel,
 }: {
   children: React.ReactNode;
@@ -52,11 +53,13 @@ export function AppShellFrame({
           {brandLabel}
         </Link>
         <nav style={{ display: "flex", gap: ".75rem", alignItems: "center", flexWrap: "wrap" }}>
-          {navigationItems.map((item) => (
-            <ButtonLink key={item.href} href={item.href} tone="ghost">
-              {item.label}
-            </ButtonLink>
-          ))}
+          {isAuthenticated
+            ? navigationItems.map((item) => (
+                <ButtonLink key={item.href} href={item.href} tone="ghost">
+                  {item.label}
+                </ButtonLink>
+              ))
+            : null}
           <button
             type="button"
             onClick={onToggleLocale}
@@ -85,7 +88,7 @@ export function AppShellFrame({
 
       <div style={{ width: "min(var(--container), calc(100% - 2rem))", margin: "1rem auto 0" }}>
         <Notice>
-          SSR auth actif, locale persistée, consentement cookies côté client, Mercure: <strong>{mercureStatus}</strong>
+          Espace sécurisé, préférences synchronisées, temps réel: <strong>{mercureStatus}</strong>
         </Notice>
       </div>
 
@@ -94,19 +97,24 @@ export function AppShellFrame({
       <main>{children}</main>
 
       {cookieBannerVisible ? (
-        <div style={cookieBannerStyle}>
-          <span>Cette base inclut une bannière cookies simple pour analytics et tags futurs.</span>
-          <div style={{ display: "flex", gap: ".75rem", flexWrap: "wrap" }}>
-            <Button onClick={onAcceptCookies}>Accepter</Button>
-            <Button tone="secondary" onClick={onDeclineCookies}>
-              Refuser
-            </Button>
+        <div style={cookieOverlayStyle} role="presentation">
+          <div style={cookieBannerStyle} role="region" aria-label="Préférences cookies">
+            <div style={{ display: "grid", gap: ".25rem", minWidth: 0 }}>
+              <strong>Préférences cookies</strong>
+              <span style={{ color: "var(--auth-muted)" }}>My App utilise les cookies nécessaires au fonctionnement du compte et aux préférences.</span>
+            </div>
+            <div style={{ display: "flex", gap: ".75rem", flexWrap: "wrap" }}>
+              <Button onClick={onAcceptCookies}>Accepter</Button>
+              <Button tone="secondary" onClick={onDeclineCookies}>
+                Refuser
+              </Button>
+            </div>
           </div>
         </div>
       ) : null}
 
       <footer style={footerStyle}>
-        <span>Frontend générique, neutralisé et dockerisé.</span>
+        <span>My App © 2026</span>
       </footer>
     </>
   );
@@ -130,21 +138,29 @@ const footerStyle: React.CSSProperties = {
   fontSize: ".92rem",
 };
 
-const cookieBannerStyle: React.CSSProperties = {
+const cookieOverlayStyle: React.CSSProperties = {
   position: "fixed",
-  left: "1rem",
-  right: "1rem",
-  bottom: "1rem",
-  background: "rgba(23, 32, 51, 0.96)",
-  color: "white",
+  inset: 0,
+  background: "rgba(24, 35, 29, 0.18)",
+  zIndex: 60,
+};
+
+const cookieBannerStyle: React.CSSProperties = {
+  position: "absolute",
+  left: "max(1rem, env(safe-area-inset-left))",
+  right: "max(1rem, env(safe-area-inset-right))",
+  bottom: "max(1rem, env(safe-area-inset-bottom))",
+  border: "1px solid rgba(255, 253, 248, 0.18)",
   borderRadius: "var(--radius-md)",
+  background: "rgba(24, 35, 29, 0.96)",
+  color: "var(--text-inverse)",
+  boxShadow: "var(--shadow-lg)",
   padding: "1rem 1.25rem",
   display: "flex",
   justifyContent: "space-between",
   gap: "1rem",
   alignItems: "center",
   flexWrap: "wrap",
-  zIndex: 20,
 };
 
 const ghostButtonStyle: React.CSSProperties = {

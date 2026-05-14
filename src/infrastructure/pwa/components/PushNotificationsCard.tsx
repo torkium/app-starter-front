@@ -28,6 +28,8 @@ export function PushNotificationsCard({
     description = "Sur iOS, installez d’abord la PWA sur l’écran d’accueil pour activer le push.";
   } else if (isSubscribed) {
     description = "Souscription active sur cet appareil.";
+  } else if (!registration) {
+    description = "Service worker en cours d’initialisation.";
   }
 
   return (
@@ -41,7 +43,7 @@ export function PushNotificationsCard({
               Désactiver
             </Button>
           ) : (
-            <Button onClick={() => void enable()} disabled={isLoading || !isSupported}>
+            <Button onClick={() => void enable()} disabled={isLoading || !isSupported || !registration}>
               Activer
             </Button>
           )}

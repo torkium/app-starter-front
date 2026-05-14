@@ -42,3 +42,28 @@ export const WithError: Story = {
     </Field>
   ),
 };
+
+export const Optional: Story = {
+  args: {
+    label: "Internal note",
+    hint: "Visible to the team only.",
+    optionalText: "Optional",
+  },
+  render: (args) => (
+    <Field {...args}>
+      <Input placeholder="Add context" />
+    </Field>
+  ),
+};
+
+export const HiddenLabel: Story = {
+  args: {
+    label: "Search",
+    labelHidden: true,
+  },
+  render: (args) => (
+    <Field {...args}>
+      <Input placeholder="Search by name" />
+    </Field>
+  ),
+};

@@ -3,8 +3,10 @@ import { getSafeMediaUrl, isTrustedMediaUrl } from "./protection";
 
 describe("media protection", () => {
   it("accepts relative protected media endpoints", () => {
-    expect(isTrustedMediaUrl("/api/media/assets/123/content")).toBe(true);
-    expect(getSafeMediaUrl("/api/media/assets/123/content")).toBe("/api/media/assets/123/content");
+    const contentUrl = "/api/media/assets/018f6f0e-7c4b-7f44-9f6a-6a69341b7f38/content";
+
+    expect(isTrustedMediaUrl(contentUrl)).toBe(true);
+    expect(getSafeMediaUrl(contentUrl)).toBe("/api/proxy/media/assets/018f6f0e-7c4b-7f44-9f6a-6a69341b7f38/content");
   });
 
   it("rejects untrusted external origins", () => {

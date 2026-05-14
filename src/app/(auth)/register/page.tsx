@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { AuthForm } from "@/domains/auth/components/AuthForm";
 import { registerAction } from "@/domains/auth/actions";
 import { getCurrentUser } from "@/infrastructure/auth/serverAuth";
@@ -13,16 +13,36 @@ export default async function RegisterPage() {
   return (
     <AuthForm
       title="Créer un compte"
-      description="Base neutre d'inscription utilisateur, sans notion de profil actif."
+      description="Lancez votre espace My App pour suivre votre espace et vos objectifs avec simplicité."
       submitLabel="Créer mon compte"
       action={registerAction}
+      liveValidation="register"
       fields={[
-        { name: "firstName", label: "Prénom", autoComplete: "given-name" },
-        { name: "lastName", label: "Nom", autoComplete: "family-name" },
         { name: "email", label: "Email", type: "email", autoComplete: "email" },
-        { name: "password", label: "Mot de passe", type: "password", autoComplete: "new-password" },
+        { name: "password", label: "Mot de passe", type: "password", autoComplete: "new-password", minLength: 12 },
+        { name: "confirmPassword", label: "Confirmer le mot de passe", type: "password", autoComplete: "new-password", minLength: 12 },
       ]}
-      footer={<Link href="/login">Déjà un compte ? Se connecter</Link>}
+      legalChecks={[
+        {
+          name: "acceptTerms",
+          label: (
+            <>
+              J’accepte les{" "}
+              <Link href={{ pathname: "/cgu" }}>CGU</Link>
+            </>
+          ),
+        },
+        {
+          name: "acceptCharter",
+          label: (
+            <>
+              J’accepte la{" "}
+              <Link href={{ pathname: "/charte" }}>charte</Link>
+            </>
+          ),
+        },
+      ]}
+      footerLinks={[{ href: "/login", label: "Se connecter", prefix: "Déjà un compte ?" }]}
     />
   );
 }

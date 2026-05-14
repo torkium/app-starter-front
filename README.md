@@ -1,14 +1,14 @@
-# starter_front
+# app-starter-front
 
-Production-minded Next.js 16 starter frontend built for JWT + refresh-token applications, centered on `User`, with SSR auth, API proxying, runtime config, and a neutral UI foundation.
+Production-minded Next.js 16 frontend foundation built for JWT + refresh-token applications, centered on `User`, with SSR auth, API proxying, runtime config, and a neutral UI foundation.
 
-This repo is designed to be reusable on its own, or as part of the full starter trio with:
-- `starter_back`: the companion Symfony backend starter
-- `starter_infra`: the companion Docker/CI-CD/operations starter
+This repo is designed to be reusable on its own, or as part of a full application stack with:
+- `app-starter-back`: the companion Symfony backend foundation
+- `app-starter-infra`: the companion Docker/CI-CD/operations foundation
 
 ## Purpose
 
-Use `starter_front` when you want a frontend foundation that already solves the non-business layer:
+Use `app-starter-front` when you want a frontend foundation that already solves the non-business layer:
 
 - SSR-safe authentication flows
 - protected and public routes
@@ -19,7 +19,7 @@ Use `starter_front` when you want a frontend foundation that already solves the 
 - neutral design system primitives
 - design-system hierarchy with primitives, molecules, organisms, and app feature wrappers
 
-The starter intentionally contains no dating-specific UI, no `Profile` concept, and no product-specific business pages.
+The foundation intentionally contains no product-specific business UI and no project-specific domain pages.
 
 ## What Is Included
 
@@ -38,7 +38,7 @@ The starter intentionally contains no dating-specific UI, no `Profile` concept, 
 - Mercure client wiring
 - runtime public config endpoint
 - Storybook sandbox for design-system primitives
-- Vitest starter tests
+- Vitest tests
 - Docker local setup and Make targets
 
 ## Prerequisites
@@ -46,20 +46,22 @@ The starter intentionally contains no dating-specific UI, no `Profile` concept, 
 - Docker Engine with Docker Compose support
 - GNU Make
 
-## Related Starters
+## Companion Repositories
 
-- `starter_back`
+- `app-starter-back`
   Use it if you want the matching backend that already exposes auth, account, billing, realtime, media, and outbox foundations expected by this frontend.
 
-- `starter_infra`
+- `app-starter-infra`
   Use it if you want the full stack orchestrator with Nginx, Mercure, Compose, CI/CD, observability, and deployment automation.
 
 Typical combinations:
-- `starter_front` alone: bring your own compatible backend and infrastructure
-- `starter_front` + `starter_back`: application layer only, with your own infra
-- `starter_front` + `starter_back` + `starter_infra`: full starter platform
+- `app-starter-front` alone: bring your own compatible backend and infrastructure
+- `app-starter-front` + `app-starter-back`: application layer only, with your own infra
+- `app-starter-front` + `app-starter-back` + `app-starter-infra`: full application platform
 
 ## Quick Start
+
+For the full My App stack, prefer `app-starter-infra` and its `make dev-up` flow. The Compose file in this repository is intended for frontend-only work, Storybook, and isolated local debugging.
 
 ```bash
 make init
@@ -72,7 +74,7 @@ Design-system sandbox in local dev:
 make storybook
 ```
 
-To turn this starter into a named project repository, run:
+To initialize this repository for a named project, run:
 
 ```bash
 ./scripts/init-project.sh \
@@ -127,11 +129,12 @@ make tooling-sh
 
 ## Expected Backend Contracts
 
-This starter does not require `starter_back`, but it expects a backend with equivalent capabilities.
+This frontend does not require `app-starter-back`, but it expects a backend with equivalent capabilities.
 
 Billing:
 - `GET API_BILLING_PLANS_PATH`
 - `GET API_BILLING_SUBSCRIPTION_PATH`
+- `GET API_BILLING_HISTORY_PATH`
 - `POST API_BILLING_CHECKOUT_PATH`
 
 Media:
@@ -148,13 +151,13 @@ Auth/account:
 - email verification flows
 - current user endpoint
 
-## Suggested Workflow With The Other Starters
+## Suggested Workflow With The Companion Repositories
 
 If you use the full trio:
 
-1. Initialize `starter_back`
-2. Initialize `starter_front`
-3. Initialize `starter_infra`
-4. Start the integrated stack from `starter_infra`
+1. Initialize `app-starter-back`
+2. Initialize `app-starter-front`
+3. Initialize `app-starter-infra`
+4. Start the integrated stack from `app-starter-infra`
 
-For full-stack environment bootstrap and deployment wiring, see the related documentation in `starter_infra`.
+For full-stack environment bootstrap and deployment wiring, see the related documentation in `app-starter-infra`.

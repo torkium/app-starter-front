@@ -44,19 +44,19 @@ health: ensure-env
 	curl -fsS http://localhost:3000/runtime-config.js
 
 lint: ensure-env
-	$(COMPOSE) run --rm tooling npm run lint
+	$(COMPOSE) run --build --rm tooling npm run lint
 
 typecheck: ensure-env
-	$(COMPOSE) run --rm tooling npm run typecheck
+	$(COMPOSE) run --build --rm tooling npm run typecheck
 
 test: ensure-env
-	$(COMPOSE) run --rm tooling npm run test
+	$(COMPOSE) run --build --rm tooling npm run test
 
 validate-public-runtime: ensure-env
-	$(COMPOSE) run --rm tooling npm run validate:public-runtime
+	$(COMPOSE) run --build --rm -e MY_APP_VALIDATE_SERVER_ENV=1 tooling npm run validate:public-runtime
 
 build: ensure-env
-	$(COMPOSE) run --rm tooling npm run build
+	$(COMPOSE) run --build --rm tooling npm run build
 
 storybook: ensure-env
 	$(STORYBOOK_COMPOSE) up --build storybook
@@ -65,6 +65,6 @@ storybook-build: ensure-env
 	$(STORYBOOK_COMPOSE) run --build --rm --no-deps storybook sh -lc 'npm run build-storybook && chown -R $(HOST_UID):$(HOST_GID) storybook-static'
 
 check: ensure-env
-	$(COMPOSE) run --rm tooling npm run check
+	$(COMPOSE) run --build --rm -e MY_APP_VALIDATE_SERVER_ENV=1 tooling sh -lc 'status=0; npm run check || status=$$?; chown -R $(HOST_UID):$(HOST_GID) .next storybook-static tsconfig.tsbuildinfo 2>/dev/null || true; exit $$status'
 
 .PHONY: ensure-env init up down restart ps config logs logs-storybook sh tooling-sh health lint typecheck test validate-public-runtime build storybook storybook-build check

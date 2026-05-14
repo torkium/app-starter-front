@@ -78,7 +78,7 @@ function assertAllowedUploadOrigin(uploadUrl: string): void {
   const uploadOrigin = new URL(uploadUrl).origin;
 
   if (allowedOrigin !== uploadOrigin) {
-    throw new Error("Origine d'upload refusée par la configuration du starter");
+    throw new Error("Origine d'upload refusée par la configuration My App");
   }
 }
 

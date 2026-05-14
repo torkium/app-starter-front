@@ -1,14 +1,14 @@
 const fallbackApiBaseUrl = "http://back:8080/api";
 
-function readPublicRuntimeValue(key: keyof NonNullable<Window["__STARTER_PUBLIC_CONFIG__"]>): string | undefined {
+function readPublicRuntimeValue(key: keyof NonNullable<Window["__MY_APP_PUBLIC_CONFIG__"]>): string | undefined {
   if (typeof window === "undefined") {
     return undefined;
   }
 
-  return window.__STARTER_PUBLIC_CONFIG__?.[key];
+  return window.__MY_APP_PUBLIC_CONFIG__?.[key];
 }
 
-function readPublicValue(key: keyof NonNullable<Window["__STARTER_PUBLIC_CONFIG__"]>, fallback: string): string {
+function readPublicValue(key: keyof NonNullable<Window["__MY_APP_PUBLIC_CONFIG__"]>, fallback: string): string {
   return readPublicRuntimeValue(key) ?? process.env[key] ?? fallback;
 }
 
@@ -26,12 +26,13 @@ export const env = {
   API_BILLING_PLANS_PATH: process.env.API_BILLING_PLANS_PATH ?? "/billing/plans",
   API_BILLING_SUBSCRIPTION_PATH: process.env.API_BILLING_SUBSCRIPTION_PATH ?? "/billing/subscription",
   API_BILLING_CHECKOUT_PATH: process.env.API_BILLING_CHECKOUT_PATH ?? "/billing/checkout",
+  API_BILLING_HISTORY_PATH: process.env.API_BILLING_HISTORY_PATH ?? "/billing/history",
   API_MEDIA_UPLOAD_PREPARE_PATH: process.env.API_MEDIA_UPLOAD_PREPARE_PATH ?? "/media/uploads",
   API_MEDIA_UPLOAD_COMPLETE_PATH: process.env.API_MEDIA_UPLOAD_COMPLETE_PATH ?? "/media/uploads/complete",
   API_MEDIA_LIBRARY_PATH: process.env.API_MEDIA_LIBRARY_PATH ?? "/media/assets",
   API_PUSH_SUBSCRIPTIONS_PATH: process.env.API_PUSH_SUBSCRIPTIONS_PATH ?? "/notifications/push/subscriptions",
   get NEXT_PUBLIC_APP_NAME() {
-    return readPublicValue("NEXT_PUBLIC_APP_NAME", process.env.NEXT_PUBLIC_APP_NAME ?? "App Front");
+    return readPublicValue("NEXT_PUBLIC_APP_NAME", process.env.NEXT_PUBLIC_APP_NAME ?? "My App");
   },
   get NEXT_PUBLIC_APP_URL() {
     return readPublicValue("NEXT_PUBLIC_APP_URL", "http://localhost:3000");

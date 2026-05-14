@@ -2,7 +2,7 @@ export {};
 
 declare global {
   interface Window {
-    __STARTER_PUBLIC_CONFIG__?: {
+    __MY_APP_PUBLIC_CONFIG__?: {
       NEXT_PUBLIC_APP_NAME?: string;
       NEXT_PUBLIC_APP_URL?: string;
       NEXT_PUBLIC_MERCURE_URL?: string;

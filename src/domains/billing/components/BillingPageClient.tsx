@@ -79,9 +79,10 @@ export function BillingPageClient() {
 
   return (
     <Section
-      eyebrow="Billing"
-      title="Facturation générique prête à brancher."
-      description="Catalogue d’offres, abonnement courant et démarrage de checkout via le proxy Next, sans dépendance métier dating."
+      eyebrow="Abonnement"
+      title="Gérez votre accès My App."
+      description="Consultez votre abonnement courant et les offres disponibles pour votre espace applicatif."
+      titleAs="h1"
     >
       <div style={{ display: "grid", gap: "1rem" }}>
         {error ? <Notice tone="warning">{error}</Notice> : null}
@@ -99,7 +100,7 @@ export function BillingPageClient() {
           {plans.length === 0 && !loading ? (
             <Card
               title="Aucune offre"
-              description="Exposez une liste de plans côté backend pour alimenter automatiquement ce shell."
+              description="Aucune formule d’abonnement n’est disponible pour le moment."
             />
           ) : null}
           {plans.map((plan) => (

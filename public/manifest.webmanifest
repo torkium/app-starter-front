@@ -1,13 +1,13 @@
 {
-  "name": "App Front",
-  "short_name": "App",
+  "name": "My App",
+  "short_name": "My App",
   "id": "/",
   "start_url": "/",
   "display": "standalone",
   "display_override": ["standalone", "browser"],
   "background_color": "#f4f1ea",
   "theme_color": "#0f766e",
-  "description": "Frontend Next.js generique avec auth SSR, proxy API, PWA et shells media/billing.",
+  "description": "Espace applicatif pour suivre contenus, données et préférences avec clarté.",
   "icons": [
     {
       "src": "/icons/icon-192.png",
@@ -29,15 +29,15 @@
   "categories": ["business", "productivity"],
   "shortcuts": [
     {
-      "name": "Dashboard",
+      "name": "Tableau de bord",
       "url": "/dashboard"
     },
     {
-      "name": "Billing",
+      "name": "Abonnement",
       "url": "/billing"
     },
     {
-      "name": "Media",
+      "name": "Médias",
       "url": "/media"
     }
   ]

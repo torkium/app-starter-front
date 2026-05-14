@@ -14,6 +14,8 @@ import type { MediaAsset } from "@/shared/types/media";
 
 export function MediaPageClient() {
   const [assets, setAssets] = useState<MediaAsset[]>([]);
+  const [nextOffset, setNextOffset] = useState<number | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -24,11 +26,15 @@ export function MediaPageClient() {
 
     async function hydrate() {
       try {
-        const response = await mediaService.listAssets().catch(() => []);
+        const response = await mediaService.listAssets({ limit: 50 }).catch(() => ({
+          items: [],
+          pagination: { limit: 50, offset: 0, nextOffset: null, hasMore: false },
+        }));
         if (cancelled) {
           return;
         }
-        setAssets(response);
+        setAssets(response.items);
+        setNextOffset(response.pagination.nextOffset);
         setLoading(false);
       } catch (cause) {
         if (cancelled) {
@@ -61,11 +67,34 @@ export function MediaPageClient() {
     } catch {}
   }
 
+  async function loadMore() {
+    if (nextOffset === null) {
+      return;
+    }
+
+    setLoadingMore(true);
+    setError(null);
+
+    try {
+      const response = await mediaService.listAssets({ limit: 50, offset: nextOffset });
+      setAssets((current) => {
+        const seen = new Set(current.map((asset) => asset.id));
+        return [...current, ...response.items.filter((asset) => !seen.has(asset.id))];
+      });
+      setNextOffset(response.pagination.nextOffset);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Chargement media impossible");
+    } finally {
+      setLoadingMore(false);
+    }
+  }
+
   return (
     <Section
       eyebrow="Media"
       title="Upload direct sécurisé et médiathèque minimale."
       description="Le navigateur envoie le binaire directement vers le stockage objet, puis confirme l’upload auprès du backend via le proxy Next."
+      titleAs="h1"
     >
       <div style={{ display: "grid", gap: "1rem" }}>
         {error ? <Notice tone="warning">{error}</Notice> : null}
@@ -122,6 +151,13 @@ export function MediaPageClient() {
             );
           })}
         </div>
+        {nextOffset !== null ? (
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <Button onClick={() => void loadMore()} disabled={loadingMore}>
+              {loadingMore ? "Chargement..." : "Charger plus"}
+            </Button>
+          </div>
+        ) : null}
       </div>
     </Section>
   );

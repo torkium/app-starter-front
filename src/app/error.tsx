@@ -21,13 +21,13 @@ export default function Error({
       title="Une erreur est survenue"
       description={
         error.digest
-          ? `Le rendu a échoué. Digest technique: ${error.digest}. Branchez ici votre monitoring et votre support.`
+          ? `Le rendu a échoué. Référence technique: ${error.digest}.`
           : "Le rendu a échoué. Vérifiez l’intégration backend ou réessayez la navigation."
       }
       action={
         <div style={{ display: "flex", gap: ".75rem", flexWrap: "wrap" }}>
           <Button onClick={reset}>Réessayer</Button>
-          <Link href="/dashboard">Retour au dashboard</Link>
+          <Link href="/login">Retour à la connexion</Link>
         </div>
       }
     />

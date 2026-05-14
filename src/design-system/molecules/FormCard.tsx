@@ -4,16 +4,20 @@ export function FormCard({
   title,
   description,
   children,
+  actions,
   footer,
+  maxWidth = "32rem",
 }: {
-  title: string;
-  description: string;
+  title: React.ReactNode;
+  description?: React.ReactNode;
   children: React.ReactNode;
+  actions?: React.ReactNode;
   footer?: React.ReactNode;
+  maxWidth?: string;
 }) {
   return (
-    <div style={{ width: "min(100%, 32rem)", margin: "0 auto" }}>
-      <Card title={title} description={description} footer={footer}>
+    <div style={{ width: `min(100%, ${maxWidth})`, margin: "0 auto" }}>
+      <Card title={title} description={description} actions={actions} footer={footer} padding="lg">
         <div style={{ display: "grid", gap: "1rem" }}>{children}</div>
       </Card>
     </div>

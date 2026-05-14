@@ -22,9 +22,6 @@ interface LoginPayload {
 interface RegisterPayload {
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
-  acceptTerms: boolean;
 }
 
 interface ForgotPasswordPayload {
@@ -136,10 +133,7 @@ export async function loginWithCredentials(payload: LoginPayload): Promise<void>
 export async function registerWithCredentials(payload: RegisterPayload): Promise<void> {
   await fetchJson(`${env.API_BASE_URL}${env.API_REGISTER_PATH}`, {
     method: "POST",
-    body: JSON.stringify({
-      ...payload,
-      confirmUrl: `${env.NEXT_PUBLIC_APP_URL}/verify-email?token=[token]`,
-    }),
+    body: JSON.stringify(payload),
   });
 }
 

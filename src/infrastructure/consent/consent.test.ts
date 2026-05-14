@@ -9,12 +9,12 @@ describe("consent", () => {
   it("writes and reads a valid consent choice", () => {
     writeConsent("accepted");
 
-    expect(document.cookie).toContain("starter_cookie_consent=accepted");
+    expect(document.cookie).toContain("my_app_cookie_consent=accepted");
     expect(readConsent()).toBe("accepted");
   });
 
   it("ignores unexpected cookie values", () => {
-    document.cookie = "starter_cookie_consent=maybe; path=/";
+    document.cookie = "my_app_cookie_consent=maybe; path=/";
 
     expect(readConsent()).toBeNull();
   });

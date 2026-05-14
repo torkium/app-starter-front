@@ -10,9 +10,9 @@ import { usePwa } from "@/infrastructure/pwa/PwaContext";
 import { AppShellFrame } from "@/design-system/organisms/AppShell";
 
 const shellNavigationItems = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/billing", label: "Billing" },
-  { href: "/media", label: "Media" },
+  { href: "/dashboard", label: "Tableau de bord" },
+  { href: "/billing", label: "Abonnement" },
+  { href: "/media", label: "Médias" },
   { href: "/account", label: "Compte" },
 ] satisfies ReadonlyArray<{ href: Route; label: string }>;
 
@@ -35,7 +35,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       onDeclineCookies={() => setConsent("declined")}
       navigationItems={[...shellNavigationItems]}
       loginHref="/login"
-      logoutAction="/api/auth/logout"
+      logoutAction="/logout"
       localeToggleLabel={locale === "fr" ? "Changer la langue en anglais" : "Switch language to French"}
       pwaBanner={
         <PwaInstallBanner

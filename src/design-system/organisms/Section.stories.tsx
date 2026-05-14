@@ -32,14 +32,14 @@ type Story = StoryObj<typeof meta>;
 
 export const Hero: Story = {
   args: {
-    eyebrow: "Foundation",
-    title: "Visual primitives should be reviewable outside product pages.",
+    eyebrow: "Fondations",
+    title: "Les sections cadrent la hiérarchie des pages My App.",
     titleAs: "h1",
-    description: "Storybook gives the starter a concrete sandbox for spacing, hierarchy, and component states.",
+    description: "Storybook sert de banc de revue pour l’espacement, la hiérarchie et les états de composants.",
     actions: (
       <>
-        <Button>Primary action</Button>
-        <Button tone="secondary">Secondary action</Button>
+        <Button>Action principale</Button>
+        <Button tone="secondary">Action secondaire</Button>
       </>
     ),
   },
@@ -52,9 +52,9 @@ export const Hero: Story = {
           gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
         }}
       >
-        <Card title="Cards" description="Use for compact summaries and navigation clusters." />
-        <Card title="Notices" description="Use for system feedback, warnings, and contextual hints." />
-        <Card title="Layouts" description="Use sections to keep page rhythm stable across products." />
+        <Card title="Cartes" description="Pour les résumés compacts et les groupes de navigation." />
+        <Card title="Messages" description="Pour les retours système, alertes et indications contextuelles." />
+        <Card title="Layouts" description="Pour maintenir un rythme de page stable." />
       </div>
     </Section>
   ),
@@ -63,15 +63,15 @@ export const Hero: Story = {
 export const EmptyStateExample: Story = {
   render: () => (
     <Section
-      eyebrow="Fallback"
-      title="Empty states still need a real visual pass."
+      eyebrow="État vide"
+      title="Les états vides méritent une vraie présence visuelle."
       titleAs="h2"
-      description="The starter should show what a non-happy-path screen actually looks like."
+      description="Même sans données, l’interface doit rester claire, utile et agréable."
     >
       <EmptyState
-        title="No projects yet"
-        description="Create your first project to start wiring APIs, auth, and billing from the starter."
-        action={<Button>Add a project</Button>}
+        title="Aucun contenus enregistré"
+        description="Ajoutez un premier contenus pour commencer votre espace applicatif."
+        action={<Button>Ajouter un contenus</Button>}
       />
     </Section>
   ),
@@ -80,15 +80,15 @@ export const EmptyStateExample: Story = {
 export const FormExample: Story = {
   render: () => (
     <Section
-      eyebrow="Forms"
-      title="Form shells should stay legible before any business logic exists."
+      eyebrow="Formulaires"
+      title="Les formulaires doivent rester lisibles et focalisés."
       titleAs="h2"
-      description="This story keeps the focus on spacing, density, and affordances."
+      description="Cette story se concentre sur l’espacement, la densité et les affordances."
     >
-      <FormCard title="Create an account" description="A neutral shell for onboarding and auth flows.">
-        <Input type="email" placeholder="Email address" />
-        <Input type="password" placeholder="Password" />
-        <Button>Create account</Button>
+      <FormCard title="Créer un compte" description="Un formulaire court pour l’onboarding et l’authentification.">
+        <Input type="email" placeholder="Adresse email" />
+        <Input type="password" placeholder="Mot de passe" />
+        <Button>Créer le compte</Button>
       </FormCard>
     </Section>
   ),

@@ -2,7 +2,8 @@
 
 import { env } from "@/infrastructure/env/env";
 import { ProxyService } from "@/infrastructure/api/ProxyService";
-import type { BillingPlan, CheckoutSessionPayload, CheckoutSessionResult, CurrentSubscription } from "@/shared/types/billing";
+import type { PaginatedResponse } from "@/shared/types/api";
+import type { BillingHistoryEvent, BillingPlan, CheckoutSessionPayload, CheckoutSessionResult, CurrentSubscription } from "@/shared/types/billing";
 
 class BillingService extends ProxyService {
   constructor() {
@@ -15,6 +16,10 @@ class BillingService extends ProxyService {
 
   getCurrentSubscription() {
     return this.get<CurrentSubscription | null>(env.API_BILLING_SUBSCRIPTION_PATH);
+  }
+
+  listHistory(query: { limit?: number; offset?: number } = {}) {
+    return this.get<PaginatedResponse<BillingHistoryEvent>>(env.API_BILLING_HISTORY_PATH, query);
   }
 
   startCheckout(payload: CheckoutSessionPayload) {

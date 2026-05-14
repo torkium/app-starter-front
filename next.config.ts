@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   typedRoutes: true,
   output: "standalone",
   devIndicators: false,
-  allowedDevOrigins: ["app.local", "localhost"],
+  allowedDevOrigins: ["my-app.local", "localhost"],
   images: {
     unoptimized: true,
   },

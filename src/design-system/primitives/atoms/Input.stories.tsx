@@ -8,6 +8,12 @@ const meta = {
   args: {
     placeholder: "Type here",
   },
+  argTypes: {
+    controlSize: {
+      control: "inline-radio",
+      options: ["sm", "md", "lg"],
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ width: "min(100%, 24rem)" }}>
@@ -36,4 +42,21 @@ export const Disabled: Story = {
     disabled: true,
     value: "Read-only preview",
   },
+};
+
+export const Invalid: Story = {
+  args: {
+    "aria-invalid": true,
+    defaultValue: "wrong-format",
+  },
+};
+
+export const Sizes: Story = {
+  render: () => (
+    <div style={{ display: "grid", gap: "var(--space-3)" }}>
+      <Input controlSize="sm" placeholder="Small" />
+      <Input placeholder="Medium" />
+      <Input controlSize="lg" placeholder="Large" />
+    </div>
+  ),
 };

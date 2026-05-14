@@ -1,37 +1,152 @@
 :root {
-  --background: #f4f1ea;
-  --surface: rgba(255, 255, 255, 0.78);
-  --surface-strong: #fffdf8;
-  --surface-contrast: #1f2937;
-  --text: #172033;
-  --text-muted: #586174;
-  --border: rgba(23, 32, 51, 0.14);
-  --primary: #0f766e;
-  --primary-strong: #115e59;
-  --primary-soft: rgba(15, 118, 110, 0.12);
+  color-scheme: light;
+
+  --font-sans: "Instrument Sans", "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+
+  --color-cream-50: #fffdf8;
+  --color-cream-100: #fbf7ef;
+  --color-cream-200: #f4efe4;
+  --color-cream-300: #e9dfcd;
+  --color-sage-50: #edf7f0;
+  --color-sage-100: #d9ebdf;
+  --color-sage-500: #4f8f69;
+  --color-sage-600: #3f7556;
+  --color-sage-700: #315d45;
+  --color-terracotta-50: #fff1ea;
+  --color-terracotta-100: #f8dcca;
+  --color-terracotta-500: #c9683d;
+  --color-terracotta-600: #a95130;
+  --color-butter-100: #fff0b8;
+  --color-butter-300: #efcc5f;
+  --color-butter-500: #8a6500;
+  --color-mauve-500: #6f5682;
+  --color-blue-500: #4c789a;
+  --color-ink-700: #334033;
+  --color-ink-800: #253126;
+  --color-ink-900: #18231d;
+  --color-white: #ffffff;
+
+  --background: var(--color-cream-100);
+  --background-elevated: var(--color-cream-50);
+  --surface: rgba(255, 253, 248, 0.82);
+  --surface-subtle: rgba(244, 239, 228, 0.72);
+  --surface-strong: var(--color-cream-50);
+  --surface-contrast: var(--color-ink-900);
+  --text: var(--color-ink-900);
+  --text-strong: #101813;
+  --text-muted: #657064;
+  --text-subtle: #657064;
+  --text-inverse: var(--color-cream-50);
+  --border: rgba(37, 49, 38, 0.14);
+  --border-strong: rgba(37, 49, 38, 0.22);
+  --primary: var(--color-sage-600);
+  --primary-strong: var(--color-sage-700);
+  --primary-soft: rgba(79, 143, 105, 0.14);
+  --primary-contrast: var(--color-cream-50);
+  --accent: var(--color-terracotta-500);
+  --accent-strong: #8f4128;
+  --accent-text: #7a351f;
+  --accent-soft: rgba(201, 104, 61, 0.14);
+  --sage-text: var(--color-sage-700);
+  --mauve-text: #5f4a70;
+  --highlight: var(--color-butter-500);
+  --highlight-soft: rgba(138, 101, 0, 0.14);
   --danger: #b42318;
+  --danger-strong: #912018;
+  --danger-soft: rgba(180, 35, 24, 0.11);
   --warning: #b54708;
+  --warning-strong: #93370d;
+  --warning-soft: rgba(181, 71, 8, 0.13);
   --success: #027a48;
-  --shadow: 0 24px 70px rgba(40, 52, 78, 0.12);
-  --radius-sm: 12px;
-  --radius-md: 18px;
-  --radius-lg: 28px;
-  --radius-pill: 999px;
-  --container: 1180px;
-  --font-sans: "Instrument Sans", "Segoe UI", sans-serif;
-  --font-display: "Fraunces", Georgia, serif;
+  --success-strong: #05603a;
+  --success-soft: rgba(2, 122, 72, 0.12);
+  --info: var(--color-blue-500);
+  --info-soft: rgba(76, 120, 154, 0.13);
+
+  --chart-1: var(--primary);
+  --chart-2: var(--accent);
+  --chart-3: var(--highlight);
+  --chart-4: var(--color-blue-500);
+  --chart-5: var(--color-mauve-500);
+
+  --space-0: 0;
+  --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
   --space-4: 1rem;
   --space-5: 1.25rem;
-  --button-padding: 0.85rem 1.25rem;
-  --button-padding-compact: 0.65rem 0.9rem;
-  --input-padding: 0.9rem 1rem;
-  --input-background: rgba(255, 255, 255, 0.9);
-  --notice-info-background: rgba(15, 118, 110, 0.08);
-  --notice-success-background: rgba(2, 122, 72, 0.12);
-  --notice-warning-background: rgba(181, 71, 8, 0.12);
-  --notice-danger-background: rgba(180, 35, 24, 0.1);
-  --focus-ring: rgba(15, 118, 110, 0.36);
-  --focus-ring-strong: var(--primary);
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+  --font-size-4xl: 2.5rem;
+  --line-height-tight: 1.15;
+  --line-height-heading: 1.22;
+  --line-height-body: 1.55;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  --shadow-xs: 0 1px 2px rgba(24, 35, 29, 0.05);
+  --shadow-sm: 0 1px 0 rgba(24, 35, 29, 0.05), 0 8px 24px -18px rgba(24, 35, 29, 0.2);
+  --shadow-md: 0 1px 0 rgba(24, 35, 29, 0.05), 0 16px 40px -24px rgba(24, 35, 29, 0.28);
+  --shadow-lg: 0 24px 70px -38px rgba(24, 35, 29, 0.36);
+  --shadow: var(--shadow-lg);
+
+  --z-base: 0;
+  --z-raised: 10;
+  --z-sticky: 20;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+
+  --focus-ring: var(--primary-strong);
+  --focus-ring-strong: var(--primary-strong);
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 3px;
+
+  --container: 1180px;
+  --control-height-sm: 2.25rem;
+  --control-height-md: 2.75rem;
+  --control-height-lg: 3.25rem;
+  --button-padding: 0.8rem 1.15rem;
+  --button-padding-compact: 0.6rem 0.9rem;
+  --input-padding: 0.78rem 0.95rem;
+  --input-background: var(--color-cream-200);
+
+  --auth-background: var(--surface-contrast);
+  --auth-foreground: var(--text-inverse);
+  --auth-muted: rgba(255, 253, 248, 0.74);
+  --auth-subtle: rgba(255, 253, 248, 0.58);
+  --auth-panel-background: rgba(255, 253, 248, 0.9);
+  --auth-panel-border: rgba(255, 253, 248, 0.22);
+  --auth-panel-shadow: 0 24px 70px -38px rgba(24, 35, 29, 0.56);
+  --auth-panel-blur: 18px;
+  --auth-scrim:
+    radial-gradient(circle at 54% 42%, rgba(239, 204, 95, 0.12) 0%, rgba(239, 204, 95, 0.04) 26%, transparent 48%),
+    linear-gradient(90deg, rgba(10, 16, 13, 0.86) 0%, rgba(10, 16, 13, 0.42) 50%, rgba(10, 16, 13, 0.7) 100%),
+    linear-gradient(0deg, rgba(10, 16, 13, 0.72), rgba(10, 16, 13, 0.1) 48%, rgba(10, 16, 13, 0.48));
+
+  --notice-info-background: var(--info-soft);
+  --notice-success-background: var(--success-soft);
+  --notice-warning-background: var(--warning-soft);
+  --notice-danger-background: var(--danger-soft);
 }

@@ -42,13 +42,18 @@ const ALLOWED_REQUEST_HEADERS = new Set([
   "range",
   "x-upload-token",
 ]);
-const ALLOWED_PROXY_PREFIXES = [
-  "account/me",
-  "account/realtime/authorize",
-  "billing/",
-  "media/",
-  "notifications/push/subscriptions",
-];
+const DEFAULT_ALLOWED_PROXY_PATHS = [
+  "/account/me",
+  "/account/realtime/authorize",
+  "/billing/plans",
+  "/billing/subscription",
+  "/billing/checkout",
+  "/billing/history",
+  "/media/uploads",
+  "/media/uploads/complete",
+  "/media/assets",
+  "/notifications/push/subscriptions",
+] as const;
 
 function buildTarget(path: string[]): string {
   const normalized = path.map((segment) => encodeURIComponent(segment)).join("/");
@@ -56,8 +61,56 @@ function buildTarget(path: string[]): string {
 }
 
 function isAllowedProxyPath(path: string[]): boolean {
-  const normalized = path.join("/");
-  return ALLOWED_PROXY_PREFIXES.some((prefix) => normalized === prefix || normalized.startsWith(prefix));
+  const normalized = `/${path.join("/")}`;
+  return buildAllowedProxyPaths().has(normalized) || isAllowedDynamicMediaPath(path);
+}
+
+function isUuidLike(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+}
+
+function isAllowedDynamicMediaPath(path: string[]): boolean {
+  const [, resource, id, action] = path;
+
+  return (
+    path.length === 4 &&
+    path[0] === "media" &&
+    ((resource === "uploads" && isUuidLike(id ?? "") && action === "binary") ||
+      (resource === "assets" && isUuidLike(id ?? "") && action === "content"))
+  );
+}
+
+function normalizeConfiguredPath(path: string): string | null {
+  const trimmed = path.trim();
+  if (!trimmed.startsWith("/")) {
+    return null;
+  }
+
+  const segments = normalizeProxyPath(trimmed.split("/").filter(Boolean));
+  return segments ? `/${segments.join("/")}` : null;
+}
+
+function buildAllowedProxyPaths(): Set<string> {
+  const paths = new Set<string>(DEFAULT_ALLOWED_PROXY_PATHS);
+  for (const configuredPath of [
+    env.API_ME_PATH,
+    "/account/realtime/authorize",
+    env.API_BILLING_PLANS_PATH,
+    env.API_BILLING_SUBSCRIPTION_PATH,
+    env.API_BILLING_CHECKOUT_PATH,
+    env.API_BILLING_HISTORY_PATH,
+    env.API_MEDIA_UPLOAD_PREPARE_PATH,
+    env.API_MEDIA_UPLOAD_COMPLETE_PATH,
+    env.API_MEDIA_LIBRARY_PATH,
+    env.API_PUSH_SUBSCRIPTIONS_PATH,
+  ]) {
+    const normalized = normalizeConfiguredPath(configuredPath);
+    if (normalized) {
+      paths.add(normalized);
+    }
+  }
+
+  return paths;
 }
 
 function normalizeProxyPath(path: string[]): string[] | null {

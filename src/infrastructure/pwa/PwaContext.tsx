@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { usePwaInit } from "@/infrastructure/pwa/usePwaInit";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -27,8 +18,8 @@ interface PwaContextValue {
 }
 
 const PwaContext = createContext<PwaContextValue | undefined>(undefined);
-const PWA_DISMISSED_STORAGE_KEY = "starter:pwa-install-dismissed";
-const PWA_DISMISSED_CHANGED_EVENT = "starter:pwa-install-dismissed-changed";
+const PWA_DISMISSED_STORAGE_KEY = "my_app:pwa-install-dismissed";
+const PWA_DISMISSED_CHANGED_EVENT = "my_app:pwa-install-dismissed-changed";
 
 function getDismissedSnapshot() {
   if (typeof window === "undefined") {
@@ -81,21 +72,21 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo<PwaContextValue>(
-    () => ({
-      canInstall,
-      isInstalled,
-      swRegistration,
-      dismissed,
-      promptInstall,
-      dismissPrompt: () => {
-        try {
-          window.localStorage.setItem(PWA_DISMISSED_STORAGE_KEY, "1");
-        } catch {
-          // Some browsers or privacy modes can block localStorage; keep the app usable.
-        }
-        window.dispatchEvent(new Event(PWA_DISMISSED_CHANGED_EVENT));
-      },
-    }),
+      () => ({
+        canInstall,
+        isInstalled,
+        swRegistration,
+        dismissed,
+        promptInstall,
+        dismissPrompt: () => {
+          try {
+            window.localStorage.setItem(PWA_DISMISSED_STORAGE_KEY, "1");
+          } catch {
+            // Some browsers or privacy modes can block localStorage; keep the app usable.
+          }
+          window.dispatchEvent(new Event(PWA_DISMISSED_CHANGED_EVENT));
+        },
+      }),
     [canInstall, dismissed, isInstalled, promptInstall, swRegistration],
   );
 

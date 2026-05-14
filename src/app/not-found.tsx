@@ -5,11 +5,11 @@ export default function NotFound() {
   return (
     <EmptyState
       title="Page introuvable"
-      description="La route demandée n’existe pas, ou n’est pas encore branchée dans ce starter générique."
+      description="La page demandée n’existe pas ou n’est plus disponible."
       action={
         <div style={{ display: "flex", gap: ".75rem", flexWrap: "wrap" }}>
           <Link href="/">Accueil</Link>
-          <Link href="/dashboard">Dashboard</Link>
+          <Link href="/login">Connexion</Link>
         </div>
       }
     />

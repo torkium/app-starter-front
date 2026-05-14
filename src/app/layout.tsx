@@ -16,12 +16,13 @@ const bodyFont = Instrument_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "App Front",
-  description: "Frontend Next.js SSR, auth, proxy API, realtime et design system neutre.",
-  applicationName: "App Front",
+  title: "My App",
+  description: "Votre espace applicatif pour suivre votre activité et vos contenus avec clarté.",
+  applicationName: "My App",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [
+      { url: "/brand/app-mark.svg", type: "image/svg+xml" },
       { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
       { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
@@ -42,7 +43,9 @@ export default async function RootLayout({
         {/* Runtime public config must be available before client providers hydrate. */}
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script src="/runtime-config.js" />
-        <AppProviders initialUser={user} initialLocale={locale}>{children}</AppProviders>
+        <AppProviders initialUser={user} initialLocale={locale}>
+          {children}
+        </AppProviders>
       </body>
     </html>
   );

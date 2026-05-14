@@ -1,13 +1,21 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+const originalEnv = { ...process.env };
 
 describe("env", () => {
   beforeEach(() => {
     vi.resetModules();
-    delete window.__STARTER_PUBLIC_CONFIG__;
+    delete window.__MY_APP_PUBLIC_CONFIG__;
+    delete process.env.API_BASE_URL;
+    delete process.env.NEXT_PUBLIC_APP_URL;
+  });
+
+  afterEach(() => {
+    process.env = { ...originalEnv };
   });
 
   it("uses public runtime config in the browser when available", async () => {
-    window.__STARTER_PUBLIC_CONFIG__ = {
+    window.__MY_APP_PUBLIC_CONFIG__ = {
       NEXT_PUBLIC_APP_URL: "https://runtime.example.test",
     };
 

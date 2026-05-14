@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Card } from "@/design-system/molecules/Card";
+import { Button } from "@/design-system/primitives/atoms/Button";
 
 const meta = {
   title: "Design System/Molecules/Card",
@@ -30,6 +31,14 @@ export const WithFooter: Story = {
   },
 };
 
+export const WithActions: Story = {
+  args: {
+    eyebrow: "Overview",
+    actions: <Button tone="secondary">Edit</Button>,
+    footer: "Updated just now",
+  },
+};
+
 export const RichContent: Story = {
   args: {
     children: (
@@ -40,5 +49,14 @@ export const RichContent: Story = {
         </p>
       </div>
     ),
+  },
+};
+
+export const Accent: Story = {
+  args: {
+    tone: "accent",
+    title: "Weekly balance",
+    description: "A softly emphasized surface for important summaries.",
+    selected: true,
   },
 };

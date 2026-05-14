@@ -1,86 +1,48 @@
 "use client";
 
-import type { Route } from "next";
-import Link from "next/link";
+import type React from "react";
 import { cn } from "@/shared/utils/cn";
+import type { ButtonSize, ButtonTone } from "@/design-system/primitives/atoms/Button.types";
 
-type ButtonTone = "primary" | "secondary" | "ghost";
+export type { ButtonSize, ButtonTone } from "@/design-system/primitives/atoms/Button.types";
 
-const baseStyle: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "var(--space-2)",
-  borderRadius: "var(--radius-pill)",
-  padding: "var(--button-padding)",
-  border: "1px solid transparent",
-  fontWeight: 600,
-  cursor: "pointer",
+export type ButtonProps = React.ComponentPropsWithRef<"button"> & {
+  tone?: ButtonTone;
+  size?: ButtonSize;
+  loading?: boolean;
+  fullWidth?: boolean;
 };
-
-function getToneStyle(tone: ButtonTone = "primary"): React.CSSProperties {
-  if (tone === "secondary") {
-    return {
-      background: "var(--surface)",
-      color: "var(--text)",
-      borderColor: "var(--border)",
-    };
-  }
-  if (tone === "ghost") {
-    return {
-      background: "transparent",
-      color: "var(--text)",
-      borderColor: "var(--border)",
-    };
-  }
-  return {
-    background: "var(--primary)",
-    color: "white",
-  };
-}
 
 export function Button({
   children,
   tone = "primary",
+  size = "md",
   loading = false,
+  fullWidth = false,
   className,
   disabled,
+  style,
+  ref,
+  type = "button",
   ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & { tone?: ButtonTone; loading?: boolean }) {
+}: ButtonProps) {
   const isDisabled = disabled || loading;
 
   return (
     <button
       {...props}
+      ref={ref}
+      type={type}
       aria-busy={loading || undefined}
-      className={cn("ui-button", "ui-focus-ring", className)}
       disabled={isDisabled}
-      style={{ ...baseStyle, ...getToneStyle(tone), ...props.style }}
+      data-loading={loading || undefined}
+      data-size={size}
+      data-tone={tone}
+      className={cn("ui-button", "ui-focus-ring", className)}
+      style={{ width: fullWidth ? "100%" : undefined, ...style }}
     >
       {loading ? <span className="ui-button__spinner" aria-hidden="true" /> : null}
-      {children}
+      <span className="ui-button__content">{children}</span>
     </button>
-  );
-}
-
-export function ButtonLink({
-  children,
-  href,
-  tone = "primary",
-  className,
-}: {
-  children: React.ReactNode;
-  href: Route;
-  tone?: ButtonTone;
-  className?: string;
-}) {
-  return (
-    <Link
-      href={href}
-      className={cn("ui-button-link", "ui-focus-ring", className)}
-      style={{ ...baseStyle, ...getToneStyle(tone) }}
-    >
-      {children}
-    </Link>
   );
 }

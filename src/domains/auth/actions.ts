@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import type { AuthActionState } from "@/domains/auth/actionState";
 import { ApiError } from "@/infrastructure/errors/apiError";
 import { clearSession, confirmEmailChange, getCurrentUser, loginWithCredentials, registerWithCredentials, requestEmailChange, requestPasswordReset, resetPassword, verifyEmail } from "@/infrastructure/auth/serverAuth";
+import { validateRegisterForm } from "@/domains/auth/registerValidation";
 
 const ALLOWED_REDIRECT_PREFIXES = ["/account", "/billing", "/dashboard", "/media"] as const;
 
@@ -19,7 +20,7 @@ function normalizeRedirectTarget(target: string): Route {
   }
 
   try {
-    const url = new URL(target, "https://app.local");
+    const url = new URL(target, "https://my-app.local");
     const isAllowedDestination = ALLOWED_REDIRECT_PREFIXES.some(
       (path) => url.pathname === path || url.pathname.startsWith(`${path}/`),
     );
@@ -75,13 +76,19 @@ export async function loginAction(_: AuthActionState, formData: FormData): Promi
 }
 
 export async function registerAction(_: AuthActionState, formData: FormData): Promise<AuthActionState> {
+  const validation = validateRegisterForm(formData);
+
+  if (!validation.ok) {
+    return {
+      error: validation.error,
+      requestId: null,
+    };
+  }
+
   try {
     await registerWithCredentials({
-      email: getString(formData, "email"),
-      password: getString(formData, "password"),
-      firstName: getString(formData, "firstName"),
-      lastName: getString(formData, "lastName"),
-      acceptTerms: true,
+      email: validation.email,
+      password: validation.password,
     });
   } catch (error) {
     return toAuthActionState(error);

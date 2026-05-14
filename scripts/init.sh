@@ -12,7 +12,7 @@ else
 fi
 
 cat <<'EOF'
-Starter front initialized.
+My App front initialized.
 
 Next steps:
 1. Review .env and align API_BASE_URL with your backend stack

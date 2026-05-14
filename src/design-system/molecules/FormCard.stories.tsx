@@ -22,14 +22,29 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    title: "Create an account",
-    description: "A neutral shell for auth and onboarding flows.",
-    footer: "No credit card required",
+    title: "Créer un compte",
+    description: "Un conteneur de formulaire court pour les parcours d’accès My App.",
+    footer: "Aucune carte bancaire requise",
     children: (
       <>
-        <Input type="email" placeholder="Email address" />
-        <Input type="password" placeholder="Password" />
-        <Button>Create account</Button>
+        <Input type="email" placeholder="Adresse email" />
+        <Input type="password" placeholder="Mot de passe" />
+        <Button>Créer le compte</Button>
+      </>
+    ),
+  },
+};
+
+export const WithHeaderAction: Story = {
+  args: {
+    title: "Inviter un proche",
+    description: "Gardez les formulaires étroits, lisibles et focalisés.",
+    actions: <Button tone="ghost">Annuler</Button>,
+    footer: "Les invitations expirent après 7 jours",
+    children: (
+      <>
+        <Input type="email" placeholder="proche@example.test" />
+        <Button>Envoyer l’invitation</Button>
       </>
     ),
   },

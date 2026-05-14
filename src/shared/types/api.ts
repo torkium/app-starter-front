@@ -13,6 +13,18 @@ export interface ApiListEnvelope<T> extends ApiEnvelope<T[]> {
   };
 }
 
+export interface Pagination {
+  limit: number;
+  offset: number;
+  nextOffset: number | null;
+  hasMore: boolean;
+}
+
+export interface PaginatedResponse<T> {
+  items: T[];
+  pagination: Pagination;
+}
+
 export interface ApiProblem {
   title?: string;
   message?: string;

@@ -32,9 +32,13 @@ services:
   tooling:
     build:
       context: .
-      target: builder
+      target: tooling
     env_file:
       - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
 
   storybook:
     profiles:

@@ -38,5 +38,9 @@ export function isTrustedMediaUrl(input?: string): boolean {
 }
 
 export function getSafeMediaUrl(input?: string): string | undefined {
-  return isTrustedMediaUrl(input) ? input : undefined;
+  if (!input || !isTrustedMediaUrl(input)) {
+    return undefined;
+  }
+
+  return input.startsWith("/api/media/") ? `/api/proxy/media/${input.slice("/api/media/".length)}` : input;
 }

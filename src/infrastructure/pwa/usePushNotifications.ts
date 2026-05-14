@@ -110,21 +110,21 @@ export function usePushNotifications(registration: ServiceWorkerRegistration | n
   }, [registration]);
 
   async function enable() {
-    if (!registration) {
-      throw new Error("Service worker indisponible");
-    }
-
-    if (!env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) {
-      throw new Error("NEXT_PUBLIC_VAPID_PUBLIC_KEY manquante");
-    }
-
-    if (!isInstalled && /iPad|iPhone|iPod/.test(navigator.userAgent)) {
-      throw new Error("Sur iOS, installez la PWA avant d’activer le push");
-    }
-
     setState((current) => ({ ...current, isLoading: true, error: null }));
 
     try {
+      if (!registration) {
+        throw new Error("Service worker indisponible");
+      }
+
+      if (!env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) {
+        throw new Error("NEXT_PUBLIC_VAPID_PUBLIC_KEY manquante");
+      }
+
+      if (!isInstalled && /iPad|iPhone|iPod/.test(navigator.userAgent)) {
+        throw new Error("Sur iOS, installez la PWA avant d’activer le push");
+      }
+
       const permission = await Notification.requestPermission();
       if (permission !== "granted") {
         throw new Error("Permission navigateur refusée");

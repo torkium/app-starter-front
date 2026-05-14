@@ -31,7 +31,7 @@ export const Authenticated: Story = {
     mercureStatus: "connected",
     navigationItems: storyNavigationItems,
     loginHref: "/login",
-    logoutAction: "/api/auth/logout",
+    logoutAction: "/logout",
     localeToggleLabel: "Changer la langue en anglais",
     onToggleLocale: () => undefined,
     cookieBannerVisible: false,

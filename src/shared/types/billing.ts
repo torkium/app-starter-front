@@ -36,3 +36,9 @@ export interface CheckoutSessionResult {
   clientSecret?: string;
   sessionId?: string;
 }
+
+export interface BillingHistoryEvent {
+  externalId: string;
+  type: string;
+  occurredAt: string;
+}

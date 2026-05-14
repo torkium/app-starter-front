@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
 import { Card } from "@/design-system/molecules/Card";
+import { Field } from "@/design-system/molecules/Field";
 import { Section } from "@/design-system/organisms/Section";
+import { Button } from "@/design-system/primitives/atoms/Button";
+import { Input } from "@/design-system/primitives/atoms/Input";
 import { listConsents, listLegalDocuments, listSessions } from "@/domains/account/server/account.server";
 import { getCurrentUser, requestEmailChange } from "@/infrastructure/auth/serverAuth";
 import { getLocale } from "@/infrastructure/i18n/serverLocale";
@@ -38,8 +41,9 @@ export default async function AccountPage({
   return (
     <Section
       eyebrow="Compte"
-      title="Briques génériques utilisateur"
-      description="Vue minimale branchée sur les endpoints de documents légaux, consentements et sessions."
+      title="Paramètres du compte"
+      description="Gérez vos informations, vos consentements et les sessions connectées à My App."
+      titleAs="h1"
     >
       <div style={gridStyle}>
         <Card title="Documents légaux" description={`${legalDocuments.length} document(s) actif(s)`}>
@@ -75,15 +79,14 @@ export default async function AccountPage({
           </ul>
         </Card>
 
-        <Card title="Changer l’email" description="Demande minimale branchée sur le endpoint authentifié du back.">
+        <Card title="Changer l’email" description="Recevez une confirmation avant de remplacer l’adresse associée à votre compte.">
           <form action={submitEmailChange} style={formStyle}>
-            <label style={labelStyle} htmlFor="email">
-              Nouvelle adresse email
-            </label>
-            <input id="email" name="email" type="email" defaultValue={user.email} style={inputStyle} required />
-            <button type="submit" style={buttonStyle}>
+            <Field label="Nouvelle adresse email" required>
+              <Input id="email" name="email" type="email" defaultValue={user.email} required />
+            </Field>
+            <Button type="submit">
               Demander le changement
-            </button>
+            </Button>
             {query.emailChangeRequested === "success" ? <p style={successStyle}>Email de confirmation envoyé.</p> : null}
             {query.emailChangeRequested === "invalid" ? <p style={errorStyle}>Adresse email invalide.</p> : null}
             {query.emailChanged === "success" ? <p style={successStyle}>Adresse email mise à jour.</p> : null}
@@ -112,35 +115,14 @@ const formStyle: React.CSSProperties = {
   gap: ".75rem",
 };
 
-const labelStyle: React.CSSProperties = {
-  fontWeight: 600,
-};
-
-const inputStyle: React.CSSProperties = {
-  border: "1px solid var(--color-border, #d0d5dd)",
-  borderRadius: "0.75rem",
-  padding: ".85rem 1rem",
-  width: "100%",
-};
-
-const buttonStyle: React.CSSProperties = {
-  border: 0,
-  borderRadius: "999px",
-  padding: ".85rem 1rem",
-  background: "var(--color-accent, #1f2937)",
-  color: "#fff",
-  fontWeight: 600,
-  cursor: "pointer",
-};
-
 const successStyle: React.CSSProperties = {
   margin: 0,
-  color: "#0f766e",
+  color: "var(--success)",
   fontSize: ".95rem",
 };
 
 const errorStyle: React.CSSProperties = {
   margin: 0,
-  color: "#b42318",
+  color: "var(--danger)",
   fontSize: ".95rem",
 };

@@ -20,9 +20,9 @@ export function PwaInstallBanner({
   return (
     <div style={bannerStyle}>
       <div style={{ display: "grid", gap: ".3rem" }}>
-        <strong>Application installable</strong>
+        <strong>Installer My App</strong>
         <span style={{ color: "var(--text-muted)" }}>
-          Le starter embarque un shell PWA réutilisable avec service worker, onboarding et point d’entrée push.
+          Ajoutez My App à votre appareil pour retrouver plus vite votre espace applicatif.
         </span>
       </div>
       <div style={{ display: "flex", gap: ".75rem", flexWrap: "wrap" }}>

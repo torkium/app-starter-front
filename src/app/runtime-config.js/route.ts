@@ -17,7 +17,7 @@ export async function GET() {
     NEXT_PUBLIC_VAPID_PUBLIC_KEY: env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
   };
 
-  return new NextResponse(`window.__STARTER_PUBLIC_CONFIG__ = ${serializePublicConfig(publicConfig)};`, {
+  return new NextResponse(`window.__MY_APP_PUBLIC_CONFIG__ = ${serializePublicConfig(publicConfig)};`, {
     headers: {
       "Content-Type": "application/javascript; charset=utf-8",
       "Cache-Control": "no-store",

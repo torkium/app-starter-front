@@ -19,3 +19,13 @@ export const Default: Story = {
     action: <Button>Add an item</Button>,
   },
 };
+
+export const WithSecondaryAction: Story = {
+  args: {
+    title: "No results",
+    description: "Try another filter or clear the current search.",
+    action: <Button>Clear filters</Button>,
+    secondaryAction: <Button tone="secondary">Create manually</Button>,
+    compact: true,
+  },
+};

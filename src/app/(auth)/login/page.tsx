@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AuthForm } from "@/domains/auth/components/AuthForm";
 import { loginAction } from "@/domains/auth/actions";
@@ -24,8 +23,8 @@ export default async function LoginPage({
 
   return (
     <AuthForm
-      title="Connexion"
-      description="Connexion SSR par cookies httpOnly, pensée pour un backend JWT + refresh token."
+      title="Se connecter"
+      description="Retrouvez votre espace applicatif et reprenez là où vous vous êtes arrêté."
       submitLabel="Se connecter"
       action={loginAction}
       notice={successMessage ? <Notice tone="success">{successMessage}</Notice> : undefined}
@@ -34,7 +33,10 @@ export default async function LoginPage({
         { name: "email", label: "Email", type: "email", autoComplete: "email" },
         { name: "password", label: "Mot de passe", type: "password", autoComplete: "current-password" },
       ]}
-      footer={<Link href="/forgot-password">Mot de passe oublié ?</Link>}
+      footerLinks={[
+        { href: "/forgot-password", label: "Mot de passe oublié ?" },
+        { href: "/register", label: "Créer un compte", prefix: "Pas encore inscrit ?" },
+      ]}
     />
   );
 }

@@ -1,7 +1,7 @@
 import type { HeadersInit } from "@/shared/types/http";
 
 export const REQUEST_ID_HEADER = "x-request-id";
-const BROWSER_REQUEST_ID_KEY = "starter.request_id";
+const BROWSER_REQUEST_ID_KEY = "my_app.request_id";
 
 function fallbackRequestId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;

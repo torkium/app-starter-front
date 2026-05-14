@@ -8,7 +8,7 @@ on:
   pull_request:
 
 concurrency:
-  group: starter-front-ci-${{ github.workflow }}-${{ github.ref }}
+  group: app-starter-front-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -40,7 +40,7 @@ jobs:
 
       - name: Validate public runtime contract
         env:
-          NEXT_PUBLIC_APP_NAME: Starter Front
+          NEXT_PUBLIC_APP_NAME: My App
           NEXT_PUBLIC_APP_URL: http://localhost:3000
           NEXT_PUBLIC_MERCURE_DISABLED: "true"
           NEXT_PUBLIC_MERCURE_URL: http://localhost/.well-known/mercure
@@ -66,19 +66,19 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t starter-front-ci:${{ github.sha }} .
+        run: docker build -t app-starter-front-ci:${{ github.sha }} .
 
       - name: Smoke test runtime image
         run: |
           set -euo pipefail
 
-          node scripts/mock-backend.mjs >/tmp/starter-front-mock.log 2>&1 &
+          node scripts/mock-backend.mjs >/tmp/app-starter-front-mock.log 2>&1 &
           mock_pid=$!
 
           cid="$(docker run -d -p 13000:3000 \
             --add-host=host.docker.internal:host-gateway \
             -e API_BASE_URL=http://host.docker.internal:4100/api \
-            -e NEXT_PUBLIC_APP_NAME='Starter Front' \
+            -e NEXT_PUBLIC_APP_NAME='My App' \
             -e NEXT_PUBLIC_APP_URL=http://localhost:13000 \
             -e NEXT_PUBLIC_MERCURE_DISABLED=false \
             -e NEXT_PUBLIC_MERCURE_URL=http://localhost:17000/.well-known/mercure \
@@ -86,7 +86,7 @@ jobs:
             -e NEXT_PUBLIC_MEDIA_BASE_URL=http://localhost:18080/media \
             -e NEXT_PUBLIC_MEDIA_UPLOAD_BASE_URL=http://localhost:13000 \
             -e NEXT_PUBLIC_VAPID_PUBLIC_KEY=BElocalTestValue1234567890 \
-            starter-front-ci:${{ github.sha }})"
+            app-starter-front-ci:${{ github.sha }})"
 
           cleanup() {
             kill "$mock_pid" >/dev/null 2>&1 || true
@@ -105,5 +105,5 @@ jobs:
           curl -fsSI http://127.0.0.1:13000/ | grep -i 'content-security-policy:.*http://localhost:17000'
           curl -fsSI http://127.0.0.1:13000/ | grep -i 'content-security-policy:.*http://localhost:18080'
           curl -fsS http://127.0.0.1:13000/api/proxy/account/me \
-            -H 'Cookie: starter_refresh_token=valid-refresh' \
+            -H 'Cookie: my_app_refresh_token=valid-refresh' \
             | grep -q '"email":"hello@example.test"'

@@ -24,10 +24,14 @@ const PUBLIC_PATHS = [
   "/reset-password",
   "/verify-email",
   "/confirm-email-change",
+  "/logout",
+  "/cgu",
+  "/charte",
 ];
 const NONCE_HEADER = "x-nonce";
 const PUBLIC_ASSET_PATHS = ["/favicon.ico", "/manifest.webmanifest", "/runtime-config.js", "/sw.js"];
 const PUBLIC_ASSET_PREFIXES = ["/brand/", "/images/", "/icons/"];
+const PUBLIC_AUTHENTICATED_PATHS = ["/cgu", "/charte", "/logout"];
 
 function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
@@ -35,6 +39,10 @@ function isPublicPath(pathname: string): boolean {
 
 function isPublicAssetPath(pathname: string): boolean {
   return PUBLIC_ASSET_PATHS.includes(pathname) || PUBLIC_ASSET_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+}
+
+function isPublicAuthenticatedPath(pathname: string): boolean {
+  return PUBLIC_AUTHENTICATED_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 }
 
 function hasUsableAccessToken(token?: string): boolean {
@@ -127,6 +135,13 @@ function clearSessionCookies(response: NextResponse): void {
       maxAge: 0,
     });
   }
+}
+
+function buildLoginRedirectUrl(request: NextRequest): URL {
+  const url = new URL("/login", request.url);
+  url.searchParams.set("redirect", `${request.nextUrl.pathname}${request.nextUrl.search}`);
+
+  return url;
 }
 
 function toOrigin(input: string | undefined): string | null {
@@ -248,7 +263,7 @@ export async function proxy(request: NextRequest) {
     const refreshResult = await refreshAccessToken(refreshToken, requestId);
 
     if (refreshResult.kind === "ok" && hasUsableAccessToken(refreshResult.tokens.access_token)) {
-      const target = isPublicPath(pathname) && pathname !== "/confirm-email-change"
+      const target = isPublicPath(pathname) && pathname !== "/confirm-email-change" && !isPublicAuthenticatedPath(pathname)
         ? new URL("/dashboard", request.url)
         : request.nextUrl;
       const refreshResponse = NextResponse.redirect(target);
@@ -260,7 +275,7 @@ export async function proxy(request: NextRequest) {
     if (refreshResult.kind === "auth_failed") {
       const clearResponse = isPublicPath(pathname)
         ? nextResponse
-        : NextResponse.redirect(new URL("/login", request.url));
+        : NextResponse.redirect(buildLoginRedirectUrl(request));
       clearResponse.headers.set(REQUEST_ID_HEADER, requestId);
       clearSessionCookies(clearResponse);
       return applySecurityHeaders(clearResponse, request, nonce);
@@ -268,8 +283,7 @@ export async function proxy(request: NextRequest) {
   }
 
   if (!authenticatedForGuard && !isPublicPath(pathname)) {
-    const url = new URL("/login", request.url);
-    url.searchParams.set("redirect", `${pathname}${request.nextUrl.search}`);
+    const url = buildLoginRedirectUrl(request);
     const redirectResponse = NextResponse.redirect(url);
     redirectResponse.headers.set(REQUEST_ID_HEADER, requestId);
     return applySecurityHeaders(redirectResponse, request, nonce);

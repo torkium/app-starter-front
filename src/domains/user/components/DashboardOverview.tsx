@@ -3,17 +3,19 @@
 import { Card } from "@/design-system/molecules/Card";
 import { Section } from "@/design-system/organisms/Section";
 import { PushNotificationsCard } from "@/infrastructure/pwa/components/PushNotificationsCard";
+import { useAuth } from "@/infrastructure/auth/AuthContext";
 import { usePwa } from "@/infrastructure/pwa/PwaContext";
-import type { AuthenticatedUser } from "@/shared/types/auth";
 
-export function DashboardOverview({ user }: { user: AuthenticatedUser | null }) {
+export function DashboardOverview() {
+  const { user } = useAuth();
   const { swRegistration, isInstalled } = usePwa();
 
   return (
     <Section
-      eyebrow="Dashboard"
-      title="Zone privée minimale."
-      description="La route est protégée par le proxy et le layout SSR hydrate déjà le contexte utilisateur."
+      eyebrow="Tableau de bord"
+      title="Bienvenue dans votre espace My App."
+      description="Votre espace applicatif prendra forme ici avec vos contenus, vos données et vos objectifs."
+      titleAs="h1"
     >
       <div style={{ display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
         <Card title="Utilisateur" description={user?.email ?? "Aucun utilisateur chargé"} />
